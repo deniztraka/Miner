@@ -8,7 +8,8 @@
         "devel": "gulp watch & node index.js",
         "production": "NODE_ENV=production node index.js",
         "server": "node index.js",
-        "start": "node index.js"
+        "start": "node index.js",
+        "heroku-postbuild": "npm run production"
     },
     "author": " <deniz.traka@gmail.com>",
     "license": "ISC",
