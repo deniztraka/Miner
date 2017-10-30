@@ -8,12 +8,15 @@
         "devel": "gulp watch & node index.js",
         "production": "NODE_ENV=production node index.js",
         "server": "node index.js",
-        "start": "node index.js"
+        "start": "node index.js",
+        "heroku-postbuild": "npm run production"
     },
     "author": " <deniz.traka@gmail.com>",
     "license": "ISC",
     "dependencies": {
         "express": "^4.14.0",
+        "typescript": "^2.0.10",
+        "phaser-ce": "^2.7.0",
         "pug": "^2.0.0-rc.4"
 
     },
@@ -28,26 +31,22 @@
         "gulp-typescript": "^2.13.6",
         "gulp-uglify": "^2.0.0",
         "gulp-util": "^3.0.7",
-        "phaser-ce": "^2.7.0",        
         "tslint": "^3.15.1",
-        "typescript": "^2.0.10",
         "typescript-tools": "github:clausreinke/typescript-tools"
     },
     "engines": {
         "node": "7.1.0"
     },
     "eslintConfig": {
-        "overrides": [
-            {
-                "files": [
-                    "build/*.js",
-                    "lib/*.js"
-                ],
-                "excludedFiles": [
-                    "node_modules/*.js"
-                ]
-            }
-        ],
+        "overrides": [{
+            "files": [
+                "build/*.js",
+                "lib/*.js"
+            ],
+            "excludedFiles": [
+                "node_modules/*.js"
+            ]
+        }],
         "env": {
             "es6": true
         }
