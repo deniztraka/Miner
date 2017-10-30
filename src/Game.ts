@@ -8,8 +8,7 @@ namespace Darkworld {
             this.state.add("Main", Darkworld.Main);
             this.state.add("Running", Darkworld.Running);
 
-            this.state.start("Boot");
-            
+            this.state.start("Boot");            
         }
 
         boot() {

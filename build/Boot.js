@@ -18,6 +18,7 @@ var Darkworld;
         Boot.prototype.preload = function () {
         };
         Boot.prototype.create = function () {
+            this.load.image('preloaderBar', './../img/preloader-bar.png');
             // Disable multitouch
             this.input.maxPointers = 1;
             // Pause if browser tab loses focus
