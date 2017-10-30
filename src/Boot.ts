@@ -7,6 +7,8 @@ namespace Darkworld {
         }
 
         create() {
+            this.load.image('preloaderBar', './../img/preloader-bar.png');
+
             // Disable multitouch
             this.input.maxPointers = 1;
 

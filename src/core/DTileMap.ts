@@ -6,6 +6,7 @@ namespace Darkworld.Core {
             super(game, key, tileWidth, tileHeight, width, height);            
         }
 
+        /* Private Methods */
         _updateMarker() {        
             var currentTile = this.getTileWorldXY(this.game.input.activePointer.worldX, this.game.input.activePointer.worldY, 16, 16);
             if (currentTile != null) {
@@ -14,6 +15,8 @@ namespace Darkworld.Core {
             }
         }
     
+
+        /* Public Methods */
         enableTileMarker() {
             this.marker = new DTileMarker(this.game);
             this.game.input.addMoveCallback(this._updateMarker, this);
@@ -27,7 +30,7 @@ namespace Darkworld.Core {
             layer = this.getLayer(layer);
     
             if (x >= 0 && x < this.layers[layer].width && y >= 0 && y < this.layers[layer].height) {
-                var index;
+                var index:any;
     
                 if (tile instanceof Darkworld.Core.DTile) {
                     index = tile.index;

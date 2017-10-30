@@ -15,14 +15,24 @@ var Darkworld;
         function Running() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.map = null;
+            _this.floorLayer = null;
             return _this;
         }
         Running.prototype.preload = function () {
         };
         Running.prototype.create = function () {
             this.map = this.game.add.tilemap();
-            console.log(this.game.add);
-            console.log(this.game);
+            this.map.addTilesetImage("tile_floor_forest");
+            this.floorLayer = this.map.create('floor', 40, 30, 16, 16);
+            this.floorLayer.resizeWorld();
+            //fill map random
+            var randomTileMapData = new Darkworld.Data.RandomTileMapData(this.game, 0, 0, 40, 30);
+            for (var i = 0; i < randomTileMapData.data.length; i++) {
+                for (var j = 0; j < randomTileMapData.data[i].length; j++) {
+                    this.map.putTile(randomTileMapData.data[i][j], i, j);
+                }
+            }
+            this.map.enableTileMarker();
             console.log(this.map);
         };
         return Running;
