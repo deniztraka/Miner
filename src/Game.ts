@@ -13,7 +13,7 @@ namespace Darkworld {
 
         boot() {
             super.boot();
-            this.add = new  Darkworld.Core.DGameObjectFactory(this);
+            this.add = new Darkworld.Core.DGameObjectFactory(this);
         }
         
     }

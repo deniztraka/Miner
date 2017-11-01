@@ -7,5 +7,11 @@
         "rootDir": "src",
         "preserveConstEnums": true,
         "sourceMap": true
-    }
+    },
+    "exclude": [
+        "node_modules",
+        "build",
+        "typescript/phaser.d.ts",
+        "typescript/pixi.d.ts"
+    ]
 }
