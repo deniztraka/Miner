@@ -8,8 +8,7 @@ namespace Darkworld.Data {
             for(var i: number = 0; i < width; i++) {
                 this.data[i] = [];
                 for(var j: number = 0; j< height; j++) {
-                    this.data[i][j] = game.rnd.integerInRange(min,max);
-                    console.log(this.data[i][j]);
+                    this.data[i][j] = game.rnd.integerInRange(min,max);                    
                 }
             }
         }        

@@ -12,4 +12,5 @@ app.get('/', (req, res) => res.render('index'));
 
 app.listen(app.get('port'), () => {
     console.log('\nExpress server up and running at http://localhost:%s.\n', app.get('port'));
+    console.log(process.env.NODE_ENV);
 });
