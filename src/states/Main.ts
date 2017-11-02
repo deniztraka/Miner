@@ -1,4 +1,4 @@
-namespace Darkworld {
+namespace Darkworld.States {
 
     export class Main extends Phaser.State {
 

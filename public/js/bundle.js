@@ -102832,10 +102832,10 @@ var Darkworld;
         __extends(DGame, _super);
         function DGame() {
             _super.call(this, 800, 600, Phaser.AUTO);
-            this.state.add("Boot", Darkworld.Boot);
-            this.state.add("Preloader", Darkworld.Preloader);
-            this.state.add("Main", Darkworld.Main);
-            this.state.add("Running", Darkworld.Running);
+            this.state.add("Boot", Darkworld.States.Boot);
+            this.state.add("Preloader", Darkworld.States.Preloader);
+            this.state.add("Main", Darkworld.States.Main);
+            this.state.add("Running", Darkworld.States.Running);
             this.state.start("Boot");
         }
         DGame.prototype.boot = function () {
@@ -102931,23 +102931,82 @@ var Darkworld;
         Running.prototype.preload = function () {
         };
         Running.prototype.create = function () {
-            this.map = this.game.add.tilemap();
+            this.map = this.game.add.tilemap(null, 16, 16, 40, 30);
             this.map.addTilesetImage("tile_floor_forest");
             this.floorLayer = this.map.create('floor', 40, 30, 16, 16);
             this.floorLayer.resizeWorld();
             //fill map random
-            var randomTileMapData = new Darkworld.Data.RandomTileMapData(this.game, 0, 0, 40, 30);
+            var randomTileMapData = new Darkworld.Data.RandomTileMapData(this.game, 4, 13, 40, 30);
             for (var i = 0; i < randomTileMapData.data.length; i++) {
                 for (var j = 0; j < randomTileMapData.data[i].length; j++) {
                     this.map.putTile(randomTileMapData.data[i][j], i, j);
                 }
             }
             this.map.enableTileMarker();
-            console.log(this.map);
         };
         return Running;
     }(Phaser.State));
     Darkworld.Running = Running;
+})(Darkworld || (Darkworld = {}));
+
+var Darkworld;
+(function (Darkworld) {
+    var Data;
+    (function (Data) {
+        var RandomTileMapData = (function () {
+            function RandomTileMapData(game, min, max, width, height) {
+                this.data = [];
+                for (var i = 0; i < width; i++) {
+                    this.data[i] = [];
+                    for (var j = 0; j < height; j++) {
+                        this.data[i][j] = game.rnd.integerInRange(min, max);
+                    }
+                }
+            }
+            return RandomTileMapData;
+        }());
+        Data.RandomTileMapData = RandomTileMapData;
+    })(Data = Darkworld.Data || (Darkworld.Data = {}));
+})(Darkworld || (Darkworld = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var Entities;
+    (function (Entities) {
+        var Entity = (function (_super) {
+            __extends(Entity, _super);
+            function Entity(game, x, y, key, frame) {
+                _super.call(this, game, x, y, key, frame);
+            }
+            return Entity;
+        }(Phaser.Sprite));
+        Entities.Entity = Entity;
+    })(Entities = Darkworld.Entities || (Darkworld.Entities = {}));
+})(Darkworld || (Darkworld = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var Entities;
+    (function (Entities) {
+        var Player = (function (_super) {
+            __extends(Player, _super);
+            function Player(game, x, y, key, frame) {
+                _super.call(this, game, x, y, key, frame);
+            }
+            return Player;
+        }(Phaser.Sprite));
+        Entities.Player = Player;
+    })(Entities = Darkworld.Entities || (Darkworld.Entities = {}));
 })(Darkworld || (Darkworld = {}));
 
 var __extends = (this && this.__extends) || function (d, b) {
@@ -103087,25 +103146,228 @@ var Darkworld;
     })(Core = Darkworld.Core || (Darkworld.Core = {}));
 })(Darkworld || (Darkworld = {}));
 
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var Darkworld;
 (function (Darkworld) {
-    var Data;
-    (function (Data) {
-        var RandomTileMapData = (function () {
-            function RandomTileMapData(game, min, max, width, height) {
-                this.data = [];
-                for (var i = 0; i < width; i++) {
-                    this.data[i] = [];
-                    for (var j = 0; j < height; j++) {
-                        this.data[i][j] = game.rnd.integerInRange(min, max);
-                        console.log(this.data[i][j]);
+    var States;
+    (function (States) {
+        var Boot = (function (_super) {
+            __extends(Boot, _super);
+            function Boot() {
+                _super.apply(this, arguments);
+            }
+            Boot.prototype.preload = function () {
+            };
+            Boot.prototype.create = function () {
+                this.load.image('preloaderBar', './../img/preloader-bar.png');
+                // Disable multitouch
+                this.input.maxPointers = 1;
+                // Pause if browser tab loses focus
+                this.stage.disableVisibilityChange = false;
+                if (this.game.device.desktop) {
+                }
+                else {
+                }
+                this.game.state.start("Preloader");
+            };
+            return Boot;
+        }(Phaser.State));
+        States.Boot = Boot;
+    })(States = Darkworld.States || (Darkworld.States = {}));
+})(Darkworld || (Darkworld = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var States;
+    (function (States) {
+        var Main = (function (_super) {
+            __extends(Main, _super);
+            function Main() {
+                _super.apply(this, arguments);
+            }
+            Main.prototype.create = function () {
+                var _this = this;
+                var lines = [
+                    "click to enter",
+                    "",
+                    "we create worlds you don't want to live in",
+                    "dtworlds"
+                ];
+                var textStyle = {
+                    fill: "rgb(105, 105, 105)",
+                    font: "px437_ati_8x16regular",
+                    fontSize: 24
+                };
+                var y = this.game.height - textStyle.fontSize - 20; // - (lines.length * 20);
+                for (var _i = 0, _a = lines.reverse(); _i < _a.length; _i++) {
+                    var line = _a[_i];
+                    this.game.add.text(20, y, line, textStyle);
+                    y -= textStyle.fontSize;
+                }
+                this.input.onTap.addOnce(function () {
+                    _this.state.start("Running");
+                });
+            };
+            return Main;
+        }(Phaser.State));
+        States.Main = Main;
+    })(States = Darkworld.States || (Darkworld.States = {}));
+})(Darkworld || (Darkworld = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var States;
+    (function (States) {
+        var Preloader = (function (_super) {
+            __extends(Preloader, _super);
+            function Preloader() {
+                _super.apply(this, arguments);
+                this.preloadBar = null;
+            }
+            Preloader.prototype.preload = function () {
+                this.game.time.advancedTiming = true;
+                this.preloadBar = this.add.sprite(300, 400, 'preloaderBar');
+                this.load.setPreloadSprite(this.preloadBar);
+                this.load.spritesheet('tile_floor_forest', './../img/tiles/EasyTiles.png', 16, 16);
+                this.load.image('playerImg', './../img/player.png');
+            };
+            Preloader.prototype.create = function () {
+                this.game.state.start("Main");
+            };
+            return Preloader;
+        }(Phaser.State));
+        States.Preloader = Preloader;
+    })(States = Darkworld.States || (Darkworld.States = {}));
+})(Darkworld || (Darkworld = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var States;
+    (function (States) {
+        var Running = (function (_super) {
+            __extends(Running, _super);
+            function Running() {
+                _super.apply(this, arguments);
+                this.map = null;
+                this.floorLayer = null;
+            }
+            Running.prototype.preload = function () {
+            };
+            Running.prototype.create = function () {
+                this.map = this.game.add.tilemap(null, 16, 16, 40, 30);
+                this.map.addTilesetImage("tile_floor_forest");
+                this.floorLayer = this.map.create('floor', 40, 30, 16, 16);
+                this.floorLayer.resizeWorld();
+                //fill map random
+                var randomTileMapData = new Darkworld.Data.RandomTileMapData(this.game, 4, 13, 40, 30);
+                for (var i = 0; i < randomTileMapData.data.length; i++) {
+                    for (var j = 0; j < randomTileMapData.data[i].length; j++) {
+                        this.map.putTile(randomTileMapData.data[i][j], i, j);
                     }
                 }
-            }
-            return RandomTileMapData;
-        }());
-        Data.RandomTileMapData = RandomTileMapData;
-    })(Data = Darkworld.Data || (Darkworld.Data = {}));
+                this.map.enableTileMarker();
+                var player = new Darkworld.Entities.Mobiles.Humanoids.Player(this.game, 30, 40);
+            };
+            return Running;
+        }(Phaser.State));
+        States.Running = Running;
+    })(States = Darkworld.States || (Darkworld.States = {}));
+})(Darkworld || (Darkworld = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var Entities;
+    (function (Entities) {
+        var Mobiles;
+        (function (Mobiles) {
+            var Mobile = (function (_super) {
+                __extends(Mobile, _super);
+                function Mobile(game, x, y, key, frame) {
+                    _super.call(this, game, x, y, key, frame);
+                }
+                return Mobile;
+            }(Darkworld.Entities.Entity));
+            Mobiles.Mobile = Mobile;
+        })(Mobiles = Entities.Mobiles || (Entities.Mobiles = {}));
+    })(Entities = Darkworld.Entities || (Darkworld.Entities = {}));
+})(Darkworld || (Darkworld = {}));
+
+
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var Entities;
+    (function (Entities) {
+        var Mobiles;
+        (function (Mobiles) {
+            var Humanoids;
+            (function (Humanoids) {
+                var Humanoid = (function (_super) {
+                    __extends(Humanoid, _super);
+                    function Humanoid(game, x, y, key, frame) {
+                        _super.call(this, game, x, y, key, frame);
+                    }
+                    return Humanoid;
+                }(Darkworld.Entities.Mobiles.Mobile));
+                Humanoids.Humanoid = Humanoid;
+            })(Humanoids = Mobiles.Humanoids || (Mobiles.Humanoids = {}));
+        })(Mobiles = Entities.Mobiles || (Entities.Mobiles = {}));
+    })(Entities = Darkworld.Entities || (Darkworld.Entities = {}));
+})(Darkworld || (Darkworld = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var Entities;
+    (function (Entities) {
+        var Mobiles;
+        (function (Mobiles) {
+            var Humanoids;
+            (function (Humanoids) {
+                var Player = (function (_super) {
+                    __extends(Player, _super);
+                    function Player(game, x, y) {
+                        _super.call(this, game, x, y, 'playerImg', null);
+                    }
+                    return Player;
+                }(Darkworld.Entities.Mobiles.Humanoids.Humanoid));
+                Humanoids.Player = Player;
+            })(Humanoids = Mobiles.Humanoids || (Mobiles.Humanoids = {}));
+        })(Mobiles = Entities.Mobiles || (Entities.Mobiles = {}));
+    })(Entities = Darkworld.Entities || (Darkworld.Entities = {}));
 })(Darkworld || (Darkworld = {}));
 
 window.onload = function () {

@@ -6,7 +6,7 @@
     "scripts": {
         "deploy": "gulp deploy",
         "devel": "gulp watch & node index.js",
-        "production": "NODE_ENV=production node index.js",
+        "production": "set NODE_ENV=production && node index.js",
         "server": "node index.js",
         "start": "node index.js"
     },
@@ -36,17 +36,15 @@
         "node": "7.1.0"
     },
     "eslintConfig": {
-        "overrides": [
-            {
-                "files": [
-                    "build/*.js",
-                    "lib/*.js"
-                ],
-                "excludedFiles": [
-                    "node_modules/*.js"
-                ]
-            }
-        ],
+        "overrides": [{
+            "files": [
+                "build/*.js",
+                "lib/*.js"
+            ],
+            "excludedFiles": [
+                "node_modules/*.js"
+            ]
+        }],
         "env": {
             "es6": true
         }
