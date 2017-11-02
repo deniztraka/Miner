@@ -3,12 +3,13 @@ namespace Darkworld.States {
     export class Boot extends Phaser.State {
 
         preload() {
-
+            this.load.image('preloaderBar', './../img/preloader-bar.png');
         }
 
         create() {
-            this.load.image('preloaderBar', './../img/preloader-bar.png');
-
+            this.game.time.advancedTiming = true;
+            this.game.canvas.oncontextmenu = function (e) { e.preventDefault(); }
+            
             // Disable multitouch
             this.input.maxPointers = 1;
 

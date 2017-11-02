@@ -3,9 +3,7 @@ namespace Darkworld.States {
     export class Preloader extends Phaser.State {
         preloadBar: Phaser.Sprite = null;
 
-        preload() {
-            this.game.time.advancedTiming = true;
-
+        preload() {            
             this.preloadBar = this.add.sprite(300, 400, 'preloaderBar');
             this.load.setPreloadSprite(this.preloadBar);
 
