@@ -9,7 +9,6 @@ var Darkworld;
                     this.data[i] = [];
                     for (var j = 0; j < height; j++) {
                         this.data[i][j] = game.rnd.integerInRange(min, max);
-                        console.log(this.data[i][j]);
                     }
                 }
             }

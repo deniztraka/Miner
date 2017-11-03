@@ -14,10 +14,10 @@ var Darkworld;
         __extends(DGame, _super);
         function DGame() {
             var _this = _super.call(this, 800, 600, Phaser.AUTO) || this;
-            _this.state.add("Boot", Darkworld.Boot);
-            _this.state.add("Preloader", Darkworld.Preloader);
-            _this.state.add("Main", Darkworld.Main);
-            _this.state.add("Running", Darkworld.Running);
+            _this.state.add("Boot", Darkworld.States.Boot);
+            _this.state.add("Preloader", Darkworld.States.Preloader);
+            _this.state.add("Main", Darkworld.States.Main);
+            _this.state.add("Running", Darkworld.States.Running);
             _this.state.start("Boot");
             return _this;
         }
