@@ -4,11 +4,13 @@ namespace Darkworld.Engines {
         isEnabled:boolean;
         actionButton:Phaser.DeviceButton;
         selectButton:Phaser.DeviceButton;
+        keyboard:Phaser.Keyboard;
         constructor(game:DGame) {
             this.game = game;
             this.isEnabled = true;
             this.actionButton = this.game.input.activePointer.leftButton;
             this.selectButton = this.game.input.activePointer.rightButton;
+            this.keyboard = this.game.input.keyboard;
         } 
         update(){
             if(this.isEnabled){
