@@ -102949,9 +102949,76 @@ var Darkworld;
     Darkworld.Running = Running;
 })(Darkworld || (Darkworld = {}));
 
+var Darkworld;
+(function (Darkworld) {
+    var Components;
+    (function (Components) {
+        var BaseComponent = (function () {
+            function BaseComponent() {
+                this.isEnabled = true;
+            }
+            BaseComponent.prototype.update = function () {
+            };
+            ;
+            return BaseComponent;
+        }());
+        Components.BaseComponent = BaseComponent;
+    })(Components = Darkworld.Components || (Darkworld.Components = {}));
+})(Darkworld || (Darkworld = {}));
 
 
 
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var Components;
+    (function (Components) {
+        var LookAtMouse = (function (_super) {
+            __extends(LookAtMouse, _super);
+            function LookAtMouse(game, entity) {
+                _super.call(this);
+                this.game = game;
+                this.entity = entity;
+                this.inputHandler = new Darkworld.Engines.InputHandler(game);
+                this.timeOfLastTween = 0;
+            }
+            LookAtMouse.prototype.update = function () {
+                _super.prototype.update.call(this);
+                if (this.game.time.elapsedSecondsSince(this.timeOfLastTween) >= 0.1) {
+                    this.game.add.tween(this.entity).to({ angle: this.anglePreviousFrame }, 500, Phaser.Easing.Sinusoidal.Out, true);
+                    this.anglePreviousFrame = this.inputHandler.getAngleFrom(this.entity);
+                    this.timeOfLastTween = this.game.time.time;
+                }
+            };
+            return LookAtMouse;
+        }(Components.BaseComponent));
+        Components.LookAtMouse = LookAtMouse;
+    })(Components = Darkworld.Components || (Darkworld.Components = {}));
+})(Darkworld || (Darkworld = {}));
+
+var Darkworld;
+(function (Darkworld) {
+    var Data;
+    (function (Data) {
+        var RandomTileMapData = (function () {
+            function RandomTileMapData(game, min, max, width, height) {
+                this.data = [];
+                for (var i = 0; i < width; i++) {
+                    this.data[i] = [];
+                    for (var j = 0; j < height; j++) {
+                        this.data[i][j] = game.rnd.integerInRange(min, max);
+                    }
+                }
+            }
+            return RandomTileMapData;
+        }());
+        Data.RandomTileMapData = RandomTileMapData;
+    })(Data = Darkworld.Data || (Darkworld.Data = {}));
+})(Darkworld || (Darkworld = {}));
 
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -103092,22 +103159,26 @@ var Darkworld;
 
 var Darkworld;
 (function (Darkworld) {
-    var Data;
-    (function (Data) {
-        var RandomTileMapData = (function () {
-            function RandomTileMapData(game, min, max, width, height) {
-                this.data = [];
-                for (var i = 0; i < width; i++) {
-                    this.data[i] = [];
-                    for (var j = 0; j < height; j++) {
-                        this.data[i][j] = game.rnd.integerInRange(min, max);
-                    }
-                }
+    var Engines;
+    (function (Engines) {
+        var InputHandler = (function () {
+            function InputHandler(game) {
+                this.game = game;
+                this.isEnabled = true;
+                this.actionButton = this.game.input.activePointer.leftButton;
+                this.selectButton = this.game.input.activePointer.rightButton;
             }
-            return RandomTileMapData;
+            InputHandler.prototype.update = function () {
+                if (this.isEnabled) {
+                }
+            };
+            InputHandler.prototype.getAngleFrom = function (entity) {
+                return Math.atan2(this.game.input.activePointer.y - entity.worldPosition.y, this.game.input.activePointer.x - entity.worldPosition.x) * (180 / Math.PI);
+            };
+            return InputHandler;
         }());
-        Data.RandomTileMapData = RandomTileMapData;
-    })(Data = Darkworld.Data || (Darkworld.Data = {}));
+        Engines.InputHandler = InputHandler;
+    })(Engines = Darkworld.Engines || (Darkworld.Engines = {}));
 })(Darkworld || (Darkworld = {}));
 
 var __extends = (this && this.__extends) || function (d, b) {
@@ -103125,11 +103196,19 @@ var Darkworld;
                 _super.call(this, game, x, y, key, frame);
                 this.anchor.setTo(0.5, 0.5);
                 this.game.add.existing(this);
+                this.customComponents = new Array();
             }
             Entity.prototype.addComponent = function (component) {
                 this.customComponents.push(component);
             };
+            Entity.prototype.addComponents = function (components) {
+                var _this = this;
+                components.forEach(function (component) {
+                    _this.addComponent(component);
+                });
+            };
             Entity.prototype.update = function () {
+                _super.prototype.update.call(this);
                 this.customComponents.forEach(function (component) {
                     if (component.isEnabled) {
                         component.update();
@@ -103160,30 +103239,6 @@ var Darkworld;
         }(Phaser.Sprite));
         Entities.Player = Player;
     })(Entities = Darkworld.Entities || (Darkworld.Entities = {}));
-})(Darkworld || (Darkworld = {}));
-
-var Darkworld;
-(function (Darkworld) {
-    var Engines;
-    (function (Engines) {
-        var InputHandler = (function () {
-            function InputHandler(game) {
-                this.game = game;
-                this.isEnabled = true;
-                this.actionButton = this.game.input.activePointer.leftButton;
-                this.selectButton = this.game.input.activePointer.rightButton;
-            }
-            InputHandler.prototype.update = function () {
-                if (this.isEnabled) {
-                }
-            };
-            InputHandler.prototype.getAngleFrom = function (entity) {
-                return Math.atan2(this.game.input.activePointer.y - entity.worldPosition.y, this.game.input.activePointer.x - entity.worldPosition.x) * (180 / Math.PI);
-            };
-            return InputHandler;
-        }());
-        Engines.InputHandler = InputHandler;
-    })(Engines = Darkworld.Engines || (Darkworld.Engines = {}));
 })(Darkworld || (Darkworld = {}));
 
 var __extends = (this && this.__extends) || function (d, b) {
@@ -103350,6 +103405,10 @@ var Darkworld;
                 function Mobile(game, x, y, key, frame) {
                     _super.call(this, game, x, y, key, frame);
                 }
+                Mobile.prototype.update = function () {
+                    _super.prototype.update.call(this);
+                };
+                ;
                 return Mobile;
             }(Darkworld.Entities.Entity));
             Mobiles.Mobile = Mobile;
@@ -103377,6 +103436,10 @@ var Darkworld;
                     function Humanoid(game, x, y, key, frame) {
                         _super.call(this, game, x, y, key, frame);
                     }
+                    Humanoid.prototype.update = function () {
+                        _super.prototype.update.call(this);
+                    };
+                    ;
                     return Humanoid;
                 }(Darkworld.Entities.Mobiles.Mobile));
                 Humanoids.Humanoid = Humanoid;
@@ -103402,15 +103465,13 @@ var Darkworld;
                     __extends(Player, _super);
                     function Player(game, x, y) {
                         _super.call(this, game, x, y, 'playerImg', null);
-                        this.inputHandler = new Darkworld.Engines.InputHandler(game);
-                        this.timeOfLastTween = 0;
+                        //Add components here
+                        this.addComponents([
+                            new Darkworld.Components.LookAtMouse(game, this)
+                        ]);
                     }
                     Player.prototype.update = function () {
-                        if (this.game.time.elapsedSecondsSince(this.timeOfLastTween) >= 0.1) {
-                            this.game.add.tween(this).to({ angle: this.anglePreviousFrame }, 500, Phaser.Easing.Sinusoidal.Out, true);
-                            this.anglePreviousFrame = this.inputHandler.getAngleFrom(this);
-                            this.timeOfLastTween = this.game.time.time;
-                        }
+                        _super.prototype.update.call(this);
                     };
                     return Player;
                 }(Darkworld.Entities.Mobiles.Humanoids.Humanoid));
