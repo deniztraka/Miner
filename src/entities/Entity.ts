@@ -23,7 +23,7 @@ namespace Darkworld.Entities {
         update(){
             super.update();            
             this.customComponents.forEach(component => {
-                if(component.isEnabled){
+                if(component.isEnabled){                    
                     component.update();
                 }
             });

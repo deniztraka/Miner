@@ -46,7 +46,7 @@ gulp.task('compress', ['bundle'], () => {
 });
 
 gulp.task('watch', ['bundle'], () => {
-    if (process.env.LIVERELOAD != '0') livereload.listen(4005);
+    if (process.env.LIVERELOAD != '0') livereload.listen(4008);
     gulp.watch(['src/**/*.ts', 'tsconfig.json'], ['bundle']);
 });
 

@@ -8,6 +8,8 @@ namespace Darkworld.States {
         }
 
         create() {
+            this.game.physics.startSystem(Phaser.Physics.P2JS);
+
             // this.map = this.game.add.tilemap(null,16,16,40,30) as Darkworld.Core.DTileMap;
             // this.map.addTilesetImage("tile_floor_forest");
             // this.floorLayer = this.map.create('floor', 40, 30, 16, 16);
