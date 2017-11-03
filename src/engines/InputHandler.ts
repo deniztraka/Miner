@@ -19,7 +19,10 @@ namespace Darkworld.Engines {
         }
 
         getAngleFrom(entity:Darkworld.Entities.Entity){
-            return Math.atan2(this.game.input.activePointer.y - entity.worldPosition.y, this.game.input.activePointer.x - entity.worldPosition.x ) * (180/Math.PI);
-        }
+
+            return this.game.physics.arcade.angleToPointer(entity);
+            //return Math.atan2(this.game.input.activePointer.y - entity.worldPosition.y, this.game.input.activePointer.x - entity.worldPosition.x ) * (180/Math.PI);
+            
+        }        
     }
 }

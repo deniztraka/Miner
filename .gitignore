@@ -26,5 +26,6 @@ Temporary Items
 .apdisk
 
 /.build
+/build
 /node_modules
 /typings

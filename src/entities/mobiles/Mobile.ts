@@ -3,7 +3,7 @@ namespace Darkworld.Entities.Mobiles{
         speed:number;
         constructor(game:Darkworld.DGame,x:number,y:number, key?: string | Phaser.RenderTexture | Phaser.BitmapData | PIXI.Texture, frame?: string | number){
             super(game,x,y,key,frame);
-            this.speed = 1;
+            this.speed = 100;
             
             
         }
