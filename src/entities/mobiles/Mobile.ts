@@ -4,6 +4,11 @@ namespace Darkworld.Entities.Mobiles{
             super(game,x,y,key,frame);
             
             
+            
         }
+
+        update(){
+            super.update();
+        };
     }
 }
