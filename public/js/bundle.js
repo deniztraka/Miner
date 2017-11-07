@@ -102973,7 +102973,7 @@ var Darkworld;
                 }
                 this.shadowTexture.context.closePath();
                 // Draw circle of light with a soft edge
-                var gradient = this.shadowTexture.context.createRadialGradient(this.mobile.x, this.mobile.y, this.distance * 0.25, this.mobile.x, this.mobile.y, this.distance);
+                var gradient = this.shadowTexture.context.createRadialGradient(this.mobile.x, this.mobile.y, this.distance * 0.25, this.mobile.x, this.mobile.y, this.distance + this.game.rnd.integerInRange(1, 10));
                 gradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
                 gradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
                 this.shadowTexture.context.fillStyle = gradient; //'rgb(255, 255, 255)';
@@ -103369,54 +103369,6 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Darkworld;
 (function (Darkworld) {
-    var Entities;
-    (function (Entities) {
-        var Entity = (function (_super) {
-            __extends(Entity, _super);
-            function Entity(game, x, y, key, frame) {
-                _super.call(this, game, x, y, key, frame);
-                this.anchor.setTo(0.5, 0.5);
-                this.game.add.existing(this);
-                this.customComponents = new Array();
-            }
-            Entity.prototype.addComponent = function (component) {
-                this.customComponents.push(component);
-            };
-            Entity.prototype.addComponents = function (components) {
-                var _this = this;
-                components.forEach(function (component) {
-                    _this.addComponent(component);
-                });
-            };
-            Entity.prototype.update = function () {
-                _super.prototype.update.call(this);
-                this.customComponents.forEach(function (component) {
-                    if (component.isEnabled) {
-                        component.update();
-                    }
-                });
-                this.debugRender();
-            };
-            Entity.prototype.debugRender = function () {
-                this.customComponents.forEach(function (component) {
-                    if (component.isEnabled) {
-                        component.debugRender();
-                    }
-                });
-            };
-            return Entity;
-        }(Phaser.Sprite));
-        Entities.Entity = Entity;
-    })(Entities = Darkworld.Entities || (Darkworld.Entities = {}));
-})(Darkworld || (Darkworld = {}));
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Darkworld;
-(function (Darkworld) {
     var States;
     (function (States) {
         var Boot = (function (_super) {
@@ -103578,6 +103530,54 @@ var Darkworld;
         }(Phaser.State));
         States.Running = Running;
     })(States = Darkworld.States || (Darkworld.States = {}));
+})(Darkworld || (Darkworld = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var Entities;
+    (function (Entities) {
+        var Entity = (function (_super) {
+            __extends(Entity, _super);
+            function Entity(game, x, y, key, frame) {
+                _super.call(this, game, x, y, key, frame);
+                this.anchor.setTo(0.5, 0.5);
+                this.game.add.existing(this);
+                this.customComponents = new Array();
+            }
+            Entity.prototype.addComponent = function (component) {
+                this.customComponents.push(component);
+            };
+            Entity.prototype.addComponents = function (components) {
+                var _this = this;
+                components.forEach(function (component) {
+                    _this.addComponent(component);
+                });
+            };
+            Entity.prototype.update = function () {
+                _super.prototype.update.call(this);
+                this.customComponents.forEach(function (component) {
+                    if (component.isEnabled) {
+                        component.update();
+                    }
+                });
+                this.debugRender();
+            };
+            Entity.prototype.debugRender = function () {
+                this.customComponents.forEach(function (component) {
+                    if (component.isEnabled) {
+                        component.debugRender();
+                    }
+                });
+            };
+            return Entity;
+        }(Phaser.Sprite));
+        Entities.Entity = Entity;
+    })(Entities = Darkworld.Entities || (Darkworld.Entities = {}));
 })(Darkworld || (Darkworld = {}));
 
 var __extends = (this && this.__extends) || function (d, b) {

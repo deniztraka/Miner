@@ -161,7 +161,7 @@ namespace Darkworld.Components {
             // Draw circle of light with a soft edge
             var gradient = this.shadowTexture.context.createRadialGradient(
                 this.mobile.x, this.mobile.y, this.distance * 0.25,
-                this.mobile.x, this.mobile.y, this.distance);
+                this.mobile.x, this.mobile.y, this.distance + this.game.rnd.integerInRange(1,10));
             gradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
             gradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
             this.shadowTexture.context.fillStyle = gradient;//'rgb(255, 255, 255)';
