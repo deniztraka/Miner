@@ -7,8 +7,8 @@ namespace Darkworld.Components {
         update() {
 
         };
-        debugRender() {
-
+        debugRender(){
+           
         };
     }
 }

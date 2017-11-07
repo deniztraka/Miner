@@ -17,6 +17,8 @@ namespace Darkworld.Entities.Mobiles.Humanoids{
             this.game.camera.follow(this);
         }
 
+        
+
         update(){     
             super.update();   
             
