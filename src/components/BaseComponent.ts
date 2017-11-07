@@ -1,11 +1,14 @@
 namespace Darkworld.Components {
     export abstract class BaseComponent implements IComponent {
         isEnabled: boolean;
-        constructor() {            
+        constructor() {
             this.isEnabled = true;
         }
-        update() {      
-                  
+        update() {
+
+        };
+        debugRender() {
+
         };
     }
 }

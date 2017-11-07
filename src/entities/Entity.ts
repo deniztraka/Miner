@@ -27,6 +27,16 @@ namespace Darkworld.Entities {
                     component.update();
                 }
             });
+
+            this.debugRender();
+        }
+
+        debugRender(){                             
+            this.customComponents.forEach(component => {
+                if(component.isEnabled){                    
+                    component.debugRender();
+                }
+            });
         }
     }
 }
