@@ -50,7 +50,7 @@ namespace Darkworld.Components {
                         results.forEach(point => {
                             tileHits.forEach(tile => {
                                 if (tile.containsPoint(point[0], point[1])) {
-                                    ray.end.setTo(point[0], point[1]);
+                                    ray.end.setTo(tile.worldX+8, tile.worldY+8);
                                     this.points.push(ray.end);
                                     throw BreakException;
                                 }
@@ -84,7 +84,7 @@ namespace Darkworld.Components {
                     results.forEach(point => {
                         tileHits.forEach(tile => {
                             if (tile.containsPoint(point[0], point[1])) {
-                                midRay.end.setTo(point[0], point[1]);
+                                midRay.end.setTo(tile.worldX+8, tile.worldY+8);
                                 this.points.push(midRay.end);
                                 throw BreakException;
                             }
@@ -117,7 +117,7 @@ namespace Darkworld.Components {
                         results.forEach(point => {
                             tileHits.forEach(tile => {
                                 if (tile.containsPoint(point[0], point[1])) {
-                                    ray.end.setTo(point[0], point[1]);
+                                    ray.end.setTo(tile.worldX+8, tile.worldY+8);
                                     this.points.push(ray.end);
                                     throw BreakException;
                                 }
@@ -144,7 +144,7 @@ namespace Darkworld.Components {
             this.rayCast();            
 
             this.shadowTexture.context.clearRect(0, 0, this.game.width, this.game.height);
-            this.shadowTexture.context.fillStyle = 'rgb(75, 75, 75)';
+            this.shadowTexture.context.fillStyle = 'rgb(1, 1, 1)';
             this.shadowTexture.context.fillRect(0, 0, this.game.width, this.game.height);
             
             this.shadowTexture.context.beginPath();
@@ -159,12 +159,22 @@ namespace Darkworld.Components {
             this.shadowTexture.context.closePath();        
 
             // Draw circle of light with a soft edge
-            var gradient = this.shadowTexture.context.createRadialGradient(
-                this.mobile.x, this.mobile.y, this.distance * 0.25,
-                this.mobile.x, this.mobile.y, this.distance + this.game.rnd.integerInRange(1,10));
-            gradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
-            gradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
-            this.shadowTexture.context.fillStyle = gradient;//'rgb(255, 255, 255)';
+            var circleGradient = this.shadowTexture.context.createRadialGradient(
+                this.mobile.x, this.mobile.y, this.distance * 0.1,
+                this.mobile.x, this.mobile.y, this.distance + this.game.rnd.integerInRange(-5,10));
+                circleGradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
+                circleGradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
+
+
+            var linearGradient = this.shadowTexture.context.createLinearGradient(
+                this.mobile.x,
+                this.mobile.y,
+                this.mobile.position.x + this.distance * Math.cos(this.mobile.rotation),
+                this.mobile.position.y + this.distance * Math.sin(this.mobile.rotation));
+            linearGradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
+            linearGradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
+
+            this.shadowTexture.context.fillStyle = circleGradient;//'rgb(255, 255, 255)';
             this.shadowTexture.context.fill();
 
             this.shadowTexture.dirty = true;            
