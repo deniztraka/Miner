@@ -31,5 +31,9 @@ namespace Darkworld.Components {
             //     this.timeOfLastTween = this.game.time.time;                
             // }
         }
+
+        debugRender(){
+            super.debugRender();
+        };
     }
 }
