@@ -1,6 +1,7 @@
 namespace Darkworld.Core {
     export class DTileMap extends Phaser.Tilemap {
         marker: DTileMarker;
+        blockingLayer:Phaser.TilemapLayer;
 
         constructor(game: Phaser.Game, key?: string, tileWidth?: number, tileHeight?: number, width?: number, height?: number) {
             super(game, key, tileWidth, tileHeight, width, height);            

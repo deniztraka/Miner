@@ -9,5 +9,9 @@ namespace Darkworld.Entities.Mobiles.Humanoids{
         update(){
             super.update();
         };
+
+        debugRender(){
+            super.debugRender();
+        };
     }
 }

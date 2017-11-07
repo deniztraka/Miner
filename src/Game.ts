@@ -1,6 +1,9 @@
 namespace Darkworld {
 
-    export class DGame extends Phaser.Game {        
+    export class DGame extends Phaser.Game { 
+        
+        worldMap:Darkworld.Core.DTileMap;
+        
         constructor() {
             super(800, 608, Phaser.AUTO);            
             this.state.add("Boot", Darkworld.States.Boot);

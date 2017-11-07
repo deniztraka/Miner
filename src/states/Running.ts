@@ -1,48 +1,67 @@
 namespace Darkworld.States {
-    export class Running extends Phaser.State {
-        map: Darkworld.Core.DTileMap = null;
-        floorLayer: Phaser.TilemapLayer = null;
+    export class Running extends Phaser.State {        
+        floorLayer: Phaser.TilemapLayer;        
         mapHeight: number;
         mapWidth: number;
-        player:Darkworld.Entities.Mobiles.Humanoids.Player;
+        player: Darkworld.Entities.Mobiles.Humanoids.Player;
+        game:DGame;        
 
         preload() {
 
         }
 
-        create() {
-            this.mapHeight = 100;//38
-            this.mapWidth = 100;//60
+        create() {                        
+            this.mapHeight = 38;//38
+            this.mapWidth = 50;//60
             this.game.physics.startSystem(Phaser.Physics.P2JS);
 
-            this.map = this.game.add.tilemap(null, 16, 16, this.mapWidth, this.mapHeight) as Darkworld.Core.DTileMap;
+            this.game.worldMap = this.game.add.tilemap(null, 16, 16, this.mapWidth, this.mapHeight) as Darkworld.Core.DTileMap;
             //this.map.addTilesetImage("tile_floor_forest");
-            this.map.addTilesetImage("tile_10");
-            this.floorLayer = this.map.create('floor', this.mapWidth, this.mapHeight, 16, 16);
+            this.game.worldMap.addTilesetImage("tile_10");
+            this.floorLayer = this.game.worldMap.create('floor', this.mapWidth, this.mapHeight, 16, 16);
+            this.game.worldMap.blockingLayer  = this.game.worldMap.create('blocking', this.mapWidth, this.mapHeight, 16, 16);
+            this.game.worldMap.blockingLayer.key = "blockingLayer";
             this.floorLayer.resizeWorld();
+            
+            
 
             //fill map random
             //let randomTileMapData = new Darkworld.Data.RandomTileMapData(this.game, 4, 13, 50, 38);
             let cellularAutomataGenerator = new Darkworld.Data.CellularAutomata(this.game, this.mapWidth, this.mapHeight, 0.4, 3, 4);
             let randomTileMapData = cellularAutomataGenerator.generateMap(2, true);
+
+            //fill with grass first
             for (var i = 0; i < randomTileMapData.length; i++) {
                 for (var j = 0; j < randomTileMapData[i].length; j++) {
-                    this.map.putTile(randomTileMapData[i][j], i, j);
+                    this.game.worldMap.putTile(0, i, j);//.alpha = 0;;
                 }
             }
 
-            this.map.enableTileMarker();
-            this.map.setCollision([1]);
+            // create blocking layer
+            for (var i = 0; i < randomTileMapData.length; i++) {
+                for (var j = 0; j < randomTileMapData[i].length; j++) {
+                    if (randomTileMapData[i][j] == 1) {
+                        var tile = this.game.worldMap.putTile(randomTileMapData[i][j], i, j, this.game.worldMap.blockingLayer);
+                    }
+                }
+            }
 
+            this.game.worldMap.enableTileMarker();
+            this.game.worldMap.setCollision([1]);
+            this.game.physics.p2.convertTilemap(this.game.worldMap, this.game.worldMap.blockingLayer);
 
             this.player = new Darkworld.Entities.Mobiles.Humanoids.Player(this.game, 30, 40);
-
-            this.game.physics.p2.convertTilemap(this.map, this.floorLayer);
-
         }
 
-        update(){
+        update() {
             
+            
+
         }
+
+        render() {
+        }
+
+
     }
 }
