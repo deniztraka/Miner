@@ -9,6 +9,7 @@ namespace Darkworld.States {
 
             this.load.spritesheet('tile_floor_forest', './../img/tiles/EasyTiles.png', 16, 16);
             this.load.spritesheet('tile_10', './../img/tiles/10.png', 16, 16);
+            this.load.spritesheet('tile_floor_dungeon', './../img/tiles/floor_broken.png', 16, 16);
             this.load.image('playerImg', './../img/player.png');
         }
 

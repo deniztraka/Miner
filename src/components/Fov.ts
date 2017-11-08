@@ -144,7 +144,7 @@ namespace Darkworld.Components {
             this.rayCast();            
 
             this.shadowTexture.context.clearRect(0, 0, this.game.width, this.game.height);
-            this.shadowTexture.context.fillStyle = 'rgb(75, 75, 75)';
+            this.shadowTexture.context.fillStyle = 'rgb(10, 10, 10)';
             this.shadowTexture.context.fillRect(0, 0, this.game.width, this.game.height);
             
             this.shadowTexture.context.beginPath();
