@@ -1,7 +1,7 @@
 namespace Darkworld.Components {
     export class Fov extends BaseComponent implements IComponent {
         private game: DGame;
-        private mobile: Darkworld.Entities.Mobiles.Mobile;
+        private entity: Darkworld.Entities.Entity;
 
         private numberOfRays: number;
         private rays: Phaser.Line[];
@@ -12,20 +12,26 @@ namespace Darkworld.Components {
 
         blockingLayer: Phaser.TilemapLayer;
         distance: number;
+        dayNightSystemComponent:DayNightSystem;
+        colorStop1:string;
+        colorStop2:string;
 
-        constructor(game: Darkworld.DGame, mobile: Darkworld.Entities.Mobiles.Mobile) {
-            super();
+        constructor(game: Darkworld.DGame, entity: Darkworld.Entities.Entity,colorStop1?:string,colorStop2?:string,distance?:number) {
+            super("Fov");
+            this.colorStop1 = colorStop1;
+            this.colorStop2 = colorStop2;
             this.game = game;
-            this.mobile = mobile;
-            this.blockingLayer = this.game.worldMap.blockingLayer;
+            this.entity = entity;
+            this.blockingLayer = this.game.dWorld.tileMap.blockingLayer;
             this.debug = false;
 
+            this.dayNightSystemComponent = this.game.dWorld.getComponent("DayNightSystem") as DayNightSystem;
             this.numberOfRays = 30;
-            this.distance = 75;
-            this.shadowTexture = this.game.make.bitmapData(this.game.width, this.game.height);
+            this.distance = distance != null ? distance : 75;
+            this.shadowTexture = this.dayNightSystemComponent.shadowTexture;
             //  Here the sprite uses the BitmapData as a texture
-            this.shadowSprite = this.game.add.sprite(this.game.width / 2, this.game.height / 2, this.shadowTexture);
-            this.shadowSprite.blendMode = Phaser.blendModes.MULTIPLY;
+            this.shadowSprite = this.dayNightSystemComponent.shadowSprite;
+            // this.shadowSprite.blendMode = Phaser.blendModes.MULTIPLY;
 
             this.shadowSprite.anchor.set(0.5);
         }
@@ -35,15 +41,15 @@ namespace Darkworld.Components {
 
             for (let i = 0; i < this.numberOfRays; i++) {
 
-                var rotation = (this.mobile.rotation * Math.PI / 180) + i * 360 / this.numberOfRays;
+                var rotation = (this.entity.rotation * Math.PI / 180) + i * 360 / this.numberOfRays;
 
                 let ray = new Phaser.Line(
-                    this.mobile.position.x,
-                    this.mobile.position.y,
+                    this.entity.position.x,
+                    this.entity.position.y,
                     // this.mobile.position.x + this.distance * Math.cos(this.mobile.rotation - (0.2 + i * 0.15)),                    
                     // this.mobile.position.y + this.distance * Math.sin(this.mobile.rotation - (0.2 + i * 0.15)));
-                    this.mobile.position.x + this.distance * Math.cos(rotation * (Math.PI / 180)),
-                    this.mobile.position.y + this.distance * Math.sin(rotation * (Math.PI / 180)));
+                    this.entity.position.x + this.distance * Math.cos(rotation * (Math.PI / 180)),
+                    this.entity.position.y + this.distance * Math.sin(rotation * (Math.PI / 180)));
 
                 this.rays.push(ray);
 
@@ -73,9 +79,6 @@ namespace Darkworld.Components {
         }
 
         private drawShadow() {
-            this.shadowTexture.context.clearRect(0, 0, this.game.width, this.game.height);
-            this.shadowTexture.context.fillStyle = 'rgb(10, 10, 10)';
-            this.shadowTexture.context.fillRect(0, 0, this.game.width, this.game.height);
 
             this.shadowTexture.context.beginPath();
             for (var i = 0; i < this.points.length; i++) {
@@ -90,10 +93,17 @@ namespace Darkworld.Components {
 
             // Draw circle of light with a soft edge
             var circleGradient = this.shadowTexture.context.createRadialGradient(
-                this.mobile.x, this.mobile.y, this.distance * 0.1,
-                this.mobile.x, this.mobile.y, this.distance + this.game.rnd.integerInRange(-2, 1));
-            circleGradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
-            circleGradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
+                this.entity.x, this.entity.y, this.distance * 0.1,
+                this.entity.x, this.entity.y, this.distance + this.game.rnd.integerInRange(-2, 1));
+            circleGradient.addColorStop(0, this.colorStop1 != null ? this.colorStop1 : 'rgba(255, 255, 255, 1.0)');
+            circleGradient.addColorStop(1, this.colorStop2 != null ? this.colorStop2 :'rgba(255, 255, 255, 0.0)');
+
+            // var color = this.color != null ? this.color : "255, 255, 255";
+            // var colorTextBright = `rgba(${color}, 1.0)`;
+            // var colorTextDark = `rgba(${color}, 1.0)`;
+
+            // circleGradient.addColorStop(0, colorTextBright);
+            // circleGradient.addColorStop(1, colorTextDark);
 
 
             // var linearGradient = this.shadowTexture.context.createLinearGradient(
@@ -106,8 +116,6 @@ namespace Darkworld.Components {
 
             this.shadowTexture.context.fillStyle = circleGradient;//'rgb(255, 255, 255)';
             this.shadowTexture.context.fill();
-
-            this.shadowTexture.dirty = true;
         }
 
         update() {
