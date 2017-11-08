@@ -1,8 +1,7 @@
 namespace Darkworld {
 
     export class DGame extends Phaser.Game { 
-        
-        worldMap:Darkworld.Core.DTileMap;
+        dWorld:Darkworld.Core.DWorld;        
         
         constructor() {
             super(800, 608, Phaser.AUTO);            

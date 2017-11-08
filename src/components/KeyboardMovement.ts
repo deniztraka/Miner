@@ -5,7 +5,7 @@ namespace Darkworld.Components{
         private keyboard:Phaser.Keyboard;        
 
         constructor(game: Darkworld.DGame,mobile: Darkworld.Entities.Mobiles.Mobile) {
-            super();            
+            super("KeyboardMovement");            
             this.game = game;
             this.mobile = mobile;
 

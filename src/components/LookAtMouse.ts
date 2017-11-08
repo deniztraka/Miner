@@ -10,7 +10,7 @@ namespace Darkworld.Components {
         timeOfLastTween: number;
 
         constructor(game: Darkworld.DGame,entity: Darkworld.Entities.Entity) {
-            super();            
+            super("LookAtMouse");            
             this.game = game;
             this.entity = entity;
 
