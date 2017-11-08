@@ -40,14 +40,79 @@ namespace Darkworld.Data {
                 //filling sides
                 for (var x = 0; x < this.width; x++) {
                     for (var y = 0; y < this.height; y++) {
-                        if (x == 0 || y==0 || x == this.width-1 || y== this.height -1) {
+                        if (x == 0 || y == 0 || x == this.width - 1 || y == this.height - 1) {
                             this.cellmap[x][y] = 1;
                         }
                     }
                 }
             }
 
+            //random map is generated
+            //now trying to shutdown closed areas            
+            var openCellFound = false;
+            while (!openCellFound) {
+                var closedCellCount = 0;
+                var randomX = this.game.rnd.integerInRange(0, this.width);
+                var randomY = this.game.rnd.integerInRange(0, this.height);
+                if (this.cellmap[randomX][randomY] == 0) {
+                    openCellFound = true; //we found an open cell
+
+                    //set flood areas to index 2
+                    this.floodFill(randomX, randomY, 0, 2);
+
+                    
+                    //set wall other open areas
+                    for (var x = 0; x < this.width; x++) {
+                        for (var y = 0; y < this.height; y++) {
+                            if (this.cellmap[x][y] == 0) {
+                                this.cellmap[x][y] = 1;
+                            }
+                        }
+                    }
+
+                    //set open flooded areas
+                    for (var x = 0; x < this.width; x++) {
+                        for (var y = 0; y < this.height; y++) {
+                            if (this.cellmap[x][y] == 2) {
+                                this.cellmap[x][y] = 0;
+                            }
+                        }
+                    }
+                }
+            }
+
             return this.cellmap;
+        }
+
+        floodFill(x: number, y: number, oldVal: number, newVal: number) {
+            var mapWidth = this.cellmap.length,
+                mapHeight = this.cellmap[0].length;
+
+            if (oldVal == null) {
+                oldVal = this.cellmap[x][y];
+            }
+
+            if (this.cellmap[x][y] !== oldVal) {
+                return true;
+            }
+
+            this.cellmap[x][y] = newVal;
+
+            if (x > 0) {
+                this.floodFill(x - 1, y, oldVal, newVal);
+            }
+
+            if (y > 0) {
+                this.floodFill(x, y - 1, oldVal, newVal);
+            }
+
+            if (x < mapWidth - 1) {
+                this.floodFill(x + 1, y, oldVal, newVal);
+            }
+
+            if (y < mapHeight - 1) {
+                this.floodFill(x, y + 1, oldVal, newVal);
+            }
         }
 
         private initialiseMap() {
