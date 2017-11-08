@@ -50,7 +50,24 @@ namespace Darkworld.States {
             this.game.worldMap.setCollision([1]);
             this.game.physics.p2.convertTilemap(this.game.worldMap, this.game.worldMap.blockingLayer);
 
-            this.player = new Darkworld.Entities.Mobiles.Humanoids.Player(this.game, 30, 40);
+            let openCellPoint:Phaser.Point;
+            let openCellFound = false;
+            while (!openCellFound) {
+               
+                var randomX = this.game.rnd.integerInRange(0, this.game.worldMap.width-1);
+                var randomY = this.game.rnd.integerInRange(0, this.game.worldMap.height-1);
+
+                
+                let randomTile = this.game.worldMap.getTile(randomX,randomY);
+                console.log(randomX + "-" + randomY + "-"+randomTile.index);
+                if (randomTile.index == 0) {
+                    
+                    openCellFound = true; //we found an open cell
+                    openCellPoint = new Phaser.Point(randomTile.worldX+randomTile.width/2,randomTile.worldY+randomTile.height/2);
+                }
+            }
+
+            this.player = new Darkworld.Entities.Mobiles.Humanoids.Player(this.game, openCellPoint.x, openCellPoint.y);
         }
 
         update() {
