@@ -8,6 +8,7 @@ namespace Darkworld.Components {
         private points: Phaser.Point[];
         private shadowTexture: Phaser.BitmapData;
         private shadowSprite: Phaser.Sprite;
+        private debug: boolean;
 
         blockingLayer: Phaser.TilemapLayer;
         distance: number;
@@ -17,12 +18,13 @@ namespace Darkworld.Components {
             this.game = game;
             this.mobile = mobile;
             this.blockingLayer = this.game.worldMap.blockingLayer;
+            this.debug = false;
 
-            this.numberOfRays = 10;
-            this.distance = 150;
+            this.numberOfRays = 30;
+            this.distance = 75;
             this.shadowTexture = this.game.make.bitmapData(this.game.width, this.game.height);
             //  Here the sprite uses the BitmapData as a texture
-            this.shadowSprite = this.game.add.sprite(this.game.width/2, this.game.height/2, this.shadowTexture);
+            this.shadowSprite = this.game.add.sprite(this.game.width / 2, this.game.height / 2, this.shadowTexture);
             this.shadowSprite.blendMode = Phaser.blendModes.MULTIPLY;
 
             this.shadowSprite.anchor.set(0.5);
@@ -31,13 +33,17 @@ namespace Darkworld.Components {
         private rayCast() {
             var BreakException = {};
 
-            for (let i = 0; i < this.numberOfRays / 2; i++) {
+            for (let i = 0; i < this.numberOfRays; i++) {
+
+                var rotation = (this.mobile.rotation * Math.PI / 180) + i * 360 / this.numberOfRays;
 
                 let ray = new Phaser.Line(
                     this.mobile.position.x,
                     this.mobile.position.y,
-                    this.mobile.position.x + this.distance * Math.cos(this.mobile.rotation - (0.2 + i * 0.15)),
-                    this.mobile.position.y + this.distance * Math.sin(this.mobile.rotation - (0.2 + i * 0.15)));
+                    // this.mobile.position.x + this.distance * Math.cos(this.mobile.rotation - (0.2 + i * 0.15)),                    
+                    // this.mobile.position.y + this.distance * Math.sin(this.mobile.rotation - (0.2 + i * 0.15)));
+                    this.mobile.position.x + this.distance * Math.cos(rotation * (Math.PI / 180)),
+                    this.mobile.position.y + this.distance * Math.sin(rotation * (Math.PI / 180)));
 
                 this.rays.push(ray);
 
@@ -50,7 +56,7 @@ namespace Darkworld.Components {
                         results.forEach(point => {
                             tileHits.forEach(tile => {
                                 if (tile.containsPoint(point[0], point[1])) {
-                                    ray.end.setTo(tile.worldX+8, tile.worldY+8);
+                                    ray.end.setTo(tile.worldX + 8, tile.worldY + 8);
                                     this.points.push(ray.end);
                                     throw BreakException;
                                 }
@@ -63,76 +69,45 @@ namespace Darkworld.Components {
                 else {
                     this.points.push(ray.end);
                 }
-            }
+            }            
+        }
 
-            this.points.reverse();
+        private drawShadow() {
+            this.shadowTexture.context.clearRect(0, 0, this.game.width, this.game.height);
+            this.shadowTexture.context.fillStyle = 'rgb(10, 10, 10)';
+            this.shadowTexture.context.fillRect(0, 0, this.game.width, this.game.height);
 
-            let midRay = new Phaser.Line(
-                this.mobile.position.x,
-                this.mobile.position.y,
-                this.mobile.position.x + this.distance * Math.cos(this.mobile.rotation),
-                this.mobile.position.y + this.distance * Math.sin(this.mobile.rotation));
-
-            this.rays.push(midRay);
-
-            let tileHits = this.blockingLayer.getRayCastTiles(midRay, 4, true, false);
-
-            if (tileHits.length > 0) {
-                try {
-                    let results: any[] = [];
-                    results = midRay.coordinatesOnLine(1, results);
-                    results.forEach(point => {
-                        tileHits.forEach(tile => {
-                            if (tile.containsPoint(point[0], point[1])) {
-                                midRay.end.setTo(tile.worldX+8, tile.worldY+8);
-                                this.points.push(midRay.end);
-                                throw BreakException;
-                            }
-                        });
-                    });
-                } catch (e) {
-                    if (e !== BreakException) throw e;
+            this.shadowTexture.context.beginPath();
+            for (var i = 0; i < this.points.length; i++) {
+                var point = this.points[i];
+                if (i == 0) {
+                    this.shadowTexture.context.moveTo(point.x, point.y);
+                } else {
+                    this.shadowTexture.context.lineTo(point.x, point.y);
                 }
             }
-            else {
-                this.points.push(midRay.end);
-            }
+            this.shadowTexture.context.closePath();
 
-            for (let i = 0; i < this.numberOfRays / 2; i++) {
+            // Draw circle of light with a soft edge
+            var circleGradient = this.shadowTexture.context.createRadialGradient(
+                this.mobile.x, this.mobile.y, this.distance * 0.1,
+                this.mobile.x, this.mobile.y, this.distance + this.game.rnd.integerInRange(-2, 1));
+            circleGradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
+            circleGradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
 
-                let ray = new Phaser.Line(
-                    this.mobile.position.x,
-                    this.mobile.position.y,
-                    this.mobile.position.x + this.distance * Math.cos(this.mobile.rotation + (0.2 + i * 0.15)),
-                    this.mobile.position.y + this.distance * Math.sin(this.mobile.rotation + (0.2 + i * 0.15)));
 
-                this.rays.push(ray);
+            // var linearGradient = this.shadowTexture.context.createLinearGradient(
+            //     this.mobile.x,
+            //     this.mobile.y,
+            //     this.mobile.position.x + this.distance * Math.cos(this.mobile.rotation),
+            //     this.mobile.position.y + this.distance * Math.sin(this.mobile.rotation));
+            // linearGradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
+            // linearGradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
 
-                let tileHits = this.blockingLayer.getRayCastTiles(ray, 4, true, false);
+            this.shadowTexture.context.fillStyle = circleGradient;//'rgb(255, 255, 255)';
+            this.shadowTexture.context.fill();
 
-                if (tileHits.length > 0) {
-                    try {
-                        let results: any[] = [];
-                        results = ray.coordinatesOnLine(1, results);
-                        results.forEach(point => {
-                            tileHits.forEach(tile => {
-                                if (tile.containsPoint(point[0], point[1])) {
-                                    ray.end.setTo(tile.worldX+8, tile.worldY+8);
-                                    this.points.push(ray.end);
-                                    throw BreakException;
-                                }
-                            });
-                        });
-                    } catch (e) {
-                        if (e !== BreakException) throw e;
-                    }
-                }
-                else {
-                    this.points.push(ray.end);
-                }
-            }
-
-            this.points.push(this.mobile.position);
+            this.shadowTexture.dirty = true;
         }
 
         update() {
@@ -141,51 +116,20 @@ namespace Darkworld.Components {
             this.rays = [];
             this.points = [];
 
-            this.rayCast();            
-
-            this.shadowTexture.context.clearRect(0, 0, this.game.width, this.game.height);
-            this.shadowTexture.context.fillStyle = 'rgb(10, 10, 10)';
-            this.shadowTexture.context.fillRect(0, 0, this.game.width, this.game.height);
-            
-            this.shadowTexture.context.beginPath();
-            for (var i = 0; i < this.points.length; i++) {
-                var point = this.points[i];
-                if (i == 0) {
-                    this.shadowTexture.context.moveTo(point.x, point.y);
-                } else {
-                    this.shadowTexture.context.lineTo(point.x, point.y);
-                }                
-            }
-            this.shadowTexture.context.closePath();        
-
-            // Draw circle of light with a soft edge
-            var circleGradient = this.shadowTexture.context.createRadialGradient(
-                this.mobile.x, this.mobile.y, this.distance * 0.1,
-                this.mobile.x, this.mobile.y, this.distance + this.game.rnd.integerInRange(-5,10));
-                circleGradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
-                circleGradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
+            this.rayCast();
+            this.drawShadow();
 
 
-            var linearGradient = this.shadowTexture.context.createLinearGradient(
-                this.mobile.x,
-                this.mobile.y,
-                this.mobile.position.x + this.distance * Math.cos(this.mobile.rotation),
-                this.mobile.position.y + this.distance * Math.sin(this.mobile.rotation));
-            linearGradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
-            linearGradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
-
-            this.shadowTexture.context.fillStyle = circleGradient;//'rgb(255, 255, 255)';
-            this.shadowTexture.context.fill();
-
-            this.shadowTexture.dirty = true;            
         }
 
 
 
         debugRender() {
-            // this.rays.forEach(ray => {
-            //     this.game.debug.geom(ray);
-            // });
+            if (this.debug) {
+                this.rays.forEach(ray => {
+                    this.game.debug.geom(ray);
+                });
+            }
         }
     }
 }
