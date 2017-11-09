@@ -102949,6 +102949,288 @@ var Darkworld;
     Darkworld.Running = Running;
 })(Darkworld || (Darkworld = {}));
 
+var Darkworld;
+(function (Darkworld) {
+    var Components;
+    (function (Components) {
+        var BaseComponent = (function () {
+            function BaseComponent(name) {
+                this.isEnabled = true;
+                this.name = name;
+            }
+            BaseComponent.prototype.update = function () {
+            };
+            ;
+            BaseComponent.prototype.debugRender = function () {
+            };
+            ;
+            return BaseComponent;
+        }());
+        Components.BaseComponent = BaseComponent;
+    })(Components = Darkworld.Components || (Darkworld.Components = {}));
+})(Darkworld || (Darkworld = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var Components;
+    (function (Components) {
+        var DayNightSystem = (function (_super) {
+            __extends(DayNightSystem, _super);
+            function DayNightSystem(game) {
+                _super.call(this, "DayNightSystem");
+                this.game = game;
+                this.debug = true;
+                this.dayLengthInSeconds = 60;
+                this.elapsedRealSeconds = 0;
+                this.elapsedGameDays = 0;
+                this.currentGameHour = 0;
+                this.currentShadowAlphaValue = 0;
+                this.shadowTexture = this.game.make.bitmapData(this.game.width, this.game.height);
+                //  Here the sprite uses the BitmapData as a texture
+                this.shadowSprite = this.game.add.sprite(this.game.width / 2, this.game.height / 2, this.shadowTexture);
+                this.shadowSprite.blendMode = Phaser.blendModes.MULTIPLY;
+                this.shadowSprite.anchor.set(0.5);
+            }
+            DayNightSystem.prototype.timerTick = function () {
+                var dayTimeInfoHelper = this.elapsedRealSeconds % this.dayLengthInSeconds;
+                if (dayTimeInfoHelper == 0) {
+                    this.elapsedGameDays++;
+                }
+                console.log("RealSecondsElapsed:" + this.elapsedRealSeconds + "\n" +
+                    "Current Game Days:" + this.elapsedGameDays + "\n" +
+                    "Current Game Hours:" + this.currentGameHour + "\n" +
+                    "Current Shadow Alpha Value:" + this.currentShadowAlphaValue + "\n");
+                this.elapsedRealSeconds++;
+                this.game.time.events.add(Phaser.Timer.SECOND * 1, this.timerTick, this);
+            };
+            DayNightSystem.prototype.drawShadow = function () {
+                this.shadowTexture.context.clearRect(0, 0, this.game.width, this.game.height);
+                this.shadowTexture.context.fillStyle = "rgba(10, 10, 10," + this.currentShadowAlphaValue.toString() + ")"; // 'rgba(10, 10, 10,0.5)';
+                this.shadowTexture.context.fillRect(0, 0, this.game.width, this.game.height);
+                this.shadowTexture.dirty = true;
+            };
+            DayNightSystem.prototype.startCycle = function () {
+                this.game.time.events.add(Phaser.Timer.SECOND * 1, this.timerTick, this);
+            };
+            DayNightSystem.prototype.update = function () {
+                _super.prototype.update.call(this);
+                this.currentGameHour = Math.floor((24 * this.elapsedRealSeconds / this.dayLengthInSeconds) % 24);
+                this.currentShadowAlphaValue = (this.currentGameHour * (1 / 24)) % 1;
+                this.drawShadow();
+            };
+            DayNightSystem.prototype.debugRender = function () {
+                if (this.debug) {
+                }
+            };
+            return DayNightSystem;
+        }(Components.BaseComponent));
+        Components.DayNightSystem = DayNightSystem;
+    })(Components = Darkworld.Components || (Darkworld.Components = {}));
+})(Darkworld || (Darkworld = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var Components;
+    (function (Components) {
+        var Fov = (function (_super) {
+            __extends(Fov, _super);
+            function Fov(game, entity, colorStop1, colorStop2, distance) {
+                _super.call(this, "Fov");
+                this.colorStop1 = colorStop1;
+                this.colorStop2 = colorStop2;
+                this.game = game;
+                this.entity = entity;
+                this.blockingLayer = this.game.dWorld.tileMap.blockingLayer;
+                this.debug = false;
+                this.dayNightSystemComponent = this.game.dWorld.getComponent("DayNightSystem");
+                this.numberOfRays = 30;
+                this.distance = distance != null ? distance : 75;
+                this.shadowTexture = this.dayNightSystemComponent.shadowTexture;
+                //  Here the sprite uses the BitmapData as a texture
+                this.shadowSprite = this.dayNightSystemComponent.shadowSprite;
+                // this.shadowSprite.blendMode = Phaser.blendModes.MULTIPLY;
+                this.shadowSprite.anchor.set(0.5);
+            }
+            Fov.prototype.rayCast = function () {
+                var _this = this;
+                var BreakException = {};
+                var _loop_1 = function(i) {
+                    rotation = (this_1.entity.rotation * Math.PI / 180) + i * 360 / this_1.numberOfRays;
+                    var ray = new Phaser.Line(this_1.entity.position.x, this_1.entity.position.y, 
+                    // this.mobile.position.x + this.distance * Math.cos(this.mobile.rotation - (0.2 + i * 0.15)),                    
+                    // this.mobile.position.y + this.distance * Math.sin(this.mobile.rotation - (0.2 + i * 0.15)));
+                    this_1.entity.position.x + this_1.distance * Math.cos(rotation * (Math.PI / 180)), this_1.entity.position.y + this_1.distance * Math.sin(rotation * (Math.PI / 180)));
+                    this_1.rays.push(ray);
+                    var tileHits = this_1.blockingLayer.getRayCastTiles(ray, 4, true, false);
+                    if (tileHits.length > 0) {
+                        try {
+                            var results = [];
+                            results = ray.coordinatesOnLine(1, results);
+                            results.forEach(function (point) {
+                                tileHits.forEach(function (tile) {
+                                    if (tile.containsPoint(point[0], point[1])) {
+                                        ray.end.setTo(tile.worldX + 8, tile.worldY + 8);
+                                        _this.points.push(ray.end);
+                                        throw BreakException;
+                                    }
+                                });
+                            });
+                        }
+                        catch (e) {
+                            if (e !== BreakException)
+                                throw e;
+                        }
+                    }
+                    else {
+                        this_1.points.push(ray.end);
+                    }
+                };
+                var this_1 = this;
+                var rotation;
+                for (var i = 0; i < this.numberOfRays; i++) {
+                    _loop_1(i);
+                }
+            };
+            Fov.prototype.drawShadow = function () {
+                this.shadowTexture.context.beginPath();
+                for (var i = 0; i < this.points.length; i++) {
+                    var point = this.points[i];
+                    if (i == 0) {
+                        this.shadowTexture.context.moveTo(point.x, point.y);
+                    }
+                    else {
+                        this.shadowTexture.context.lineTo(point.x, point.y);
+                    }
+                }
+                this.shadowTexture.context.closePath();
+                // Draw circle of light with a soft edge
+                var circleGradient = this.shadowTexture.context.createRadialGradient(this.entity.x, this.entity.y, this.distance * 0.1, this.entity.x, this.entity.y, this.distance + this.game.rnd.integerInRange(-2, 1));
+                circleGradient.addColorStop(0, this.colorStop1 != null ? this.colorStop1 : 'rgba(255, 255, 255, 1.0)');
+                circleGradient.addColorStop(1, this.colorStop2 != null ? this.colorStop2 : 'rgba(255, 255, 255, 0.0)');
+                // var color = this.color != null ? this.color : "255, 255, 255";
+                // var colorTextBright = `rgba(${color}, 1.0)`;
+                // var colorTextDark = `rgba(${color}, 1.0)`;
+                // circleGradient.addColorStop(0, colorTextBright);
+                // circleGradient.addColorStop(1, colorTextDark);
+                // var linearGradient = this.shadowTexture.context.createLinearGradient(
+                //     this.mobile.x,
+                //     this.mobile.y,
+                //     this.mobile.position.x + this.distance * Math.cos(this.mobile.rotation),
+                //     this.mobile.position.y + this.distance * Math.sin(this.mobile.rotation));
+                // linearGradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
+                // linearGradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
+                this.shadowTexture.context.fillStyle = circleGradient; //'rgb(255, 255, 255)';
+                this.shadowTexture.context.fill();
+            };
+            Fov.prototype.update = function () {
+                _super.prototype.update.call(this);
+                this.rays = [];
+                this.points = [];
+                this.rayCast();
+                this.drawShadow();
+            };
+            Fov.prototype.debugRender = function () {
+                var _this = this;
+                if (this.debug) {
+                    this.rays.forEach(function (ray) {
+                        _this.game.debug.geom(ray);
+                    });
+                }
+            };
+            return Fov;
+        }(Components.BaseComponent));
+        Components.Fov = Fov;
+    })(Components = Darkworld.Components || (Darkworld.Components = {}));
+})(Darkworld || (Darkworld = {}));
+
+
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var Components;
+    (function (Components) {
+        var KeyboardMovement = (function (_super) {
+            __extends(KeyboardMovement, _super);
+            function KeyboardMovement(game, mobile) {
+                _super.call(this, "KeyboardMovement");
+                this.game = game;
+                this.mobile = mobile;
+                this.keyboard = new Darkworld.Engines.InputHandler(game).keyboard;
+            }
+            KeyboardMovement.prototype.update = function () {
+                _super.prototype.update.call(this);
+                this.mobile.body.setZeroVelocity();
+                if (this.keyboard.isDown(Phaser.KeyCode.W)) {
+                    this.mobile.body.moveUp(this.mobile.speed);
+                }
+                if (this.keyboard.isDown(Phaser.KeyCode.S)) {
+                    this.mobile.body.moveDown(this.mobile.speed);
+                }
+                if (this.keyboard.isDown(Phaser.KeyCode.A)) {
+                    this.mobile.body.moveLeft(this.mobile.speed);
+                }
+                if (this.keyboard.isDown(Phaser.KeyCode.D)) {
+                    this.mobile.body.moveRight(this.mobile.speed);
+                }
+            };
+            return KeyboardMovement;
+        }(Components.BaseComponent));
+        Components.KeyboardMovement = KeyboardMovement;
+    })(Components = Darkworld.Components || (Darkworld.Components = {}));
+})(Darkworld || (Darkworld = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var Components;
+    (function (Components) {
+        var LookAtMouse = (function (_super) {
+            __extends(LookAtMouse, _super);
+            function LookAtMouse(game, entity) {
+                _super.call(this, "LookAtMouse");
+                this.game = game;
+                this.entity = entity;
+                this.inputHandler = new Darkworld.Engines.InputHandler(game);
+                this.timeOfLastTween = 0;
+            }
+            LookAtMouse.prototype.update = function () {
+                _super.prototype.update.call(this);
+                this.entity.rotation = this.inputHandler.getAngleFrom(this.entity);
+                // if (this.game.time.elapsedSecondsSince(this.timeOfLastTween) >= 0.1) {
+                //     this.game.add.tween(this.entity).to({ rotation: this.anglePreviousFrame }, 500, Phaser.Easing.Sinusoidal.Out, true);
+                //     this.anglePreviousFrame = this.inputHandler.getAngleFrom(this.entity);
+                //     this.timeOfLastTween = this.game.time.time;                
+                // }
+            };
+            LookAtMouse.prototype.debugRender = function () {
+                _super.prototype.debugRender.call(this);
+            };
+            ;
+            return LookAtMouse;
+        }(Components.BaseComponent));
+        Components.LookAtMouse = LookAtMouse;
+    })(Components = Darkworld.Components || (Darkworld.Components = {}));
+})(Darkworld || (Darkworld = {}));
+
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -103197,266 +103479,6 @@ var Darkworld;
 
 var Darkworld;
 (function (Darkworld) {
-    var Components;
-    (function (Components) {
-        var BaseComponent = (function () {
-            function BaseComponent(name) {
-                this.isEnabled = true;
-                this.name = name;
-            }
-            BaseComponent.prototype.update = function () {
-            };
-            ;
-            BaseComponent.prototype.debugRender = function () {
-            };
-            ;
-            return BaseComponent;
-        }());
-        Components.BaseComponent = BaseComponent;
-    })(Components = Darkworld.Components || (Darkworld.Components = {}));
-})(Darkworld || (Darkworld = {}));
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Darkworld;
-(function (Darkworld) {
-    var Components;
-    (function (Components) {
-        var DayNightSystem = (function (_super) {
-            __extends(DayNightSystem, _super);
-            function DayNightSystem(game) {
-                _super.call(this, "DayNightSystem");
-                this.game = game;
-                this.debug = false;
-                this.shadowTexture = this.game.make.bitmapData(this.game.width, this.game.height);
-                //  Here the sprite uses the BitmapData as a texture
-                this.shadowSprite = this.game.add.sprite(this.game.width / 2, this.game.height / 2, this.shadowTexture);
-                this.shadowSprite.blendMode = Phaser.blendModes.MULTIPLY;
-                this.shadowSprite.anchor.set(0.5);
-            }
-            DayNightSystem.prototype.drawShadow = function () {
-                this.shadowTexture.context.clearRect(0, 0, this.game.width, this.game.height);
-                this.shadowTexture.context.fillStyle = 'rgb(10, 10, 10)';
-                this.shadowTexture.context.fillRect(0, 0, this.game.width, this.game.height);
-                this.shadowTexture.dirty = true;
-            };
-            DayNightSystem.prototype.update = function () {
-                _super.prototype.update.call(this);
-                this.drawShadow();
-            };
-            DayNightSystem.prototype.debugRender = function () {
-                if (this.debug) {
-                }
-            };
-            return DayNightSystem;
-        }(Components.BaseComponent));
-        Components.DayNightSystem = DayNightSystem;
-    })(Components = Darkworld.Components || (Darkworld.Components = {}));
-})(Darkworld || (Darkworld = {}));
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Darkworld;
-(function (Darkworld) {
-    var Components;
-    (function (Components) {
-        var Fov = (function (_super) {
-            __extends(Fov, _super);
-            function Fov(game, entity, colorStop1, colorStop2, distance) {
-                _super.call(this, "Fov");
-                this.colorStop1 = colorStop1;
-                this.colorStop2 = colorStop2;
-                this.game = game;
-                this.entity = entity;
-                this.blockingLayer = this.game.dWorld.tileMap.blockingLayer;
-                this.debug = false;
-                this.dayNightSystemComponent = this.game.dWorld.getComponent("DayNightSystem");
-                this.numberOfRays = 30;
-                this.distance = distance != null ? distance : 75;
-                this.shadowTexture = this.dayNightSystemComponent.shadowTexture;
-                //  Here the sprite uses the BitmapData as a texture
-                this.shadowSprite = this.dayNightSystemComponent.shadowSprite;
-                // this.shadowSprite.blendMode = Phaser.blendModes.MULTIPLY;
-                this.shadowSprite.anchor.set(0.5);
-            }
-            Fov.prototype.rayCast = function () {
-                var _this = this;
-                var BreakException = {};
-                var _loop_1 = function(i) {
-                    rotation = (this_1.entity.rotation * Math.PI / 180) + i * 360 / this_1.numberOfRays;
-                    var ray = new Phaser.Line(this_1.entity.position.x, this_1.entity.position.y, 
-                    // this.mobile.position.x + this.distance * Math.cos(this.mobile.rotation - (0.2 + i * 0.15)),                    
-                    // this.mobile.position.y + this.distance * Math.sin(this.mobile.rotation - (0.2 + i * 0.15)));
-                    this_1.entity.position.x + this_1.distance * Math.cos(rotation * (Math.PI / 180)), this_1.entity.position.y + this_1.distance * Math.sin(rotation * (Math.PI / 180)));
-                    this_1.rays.push(ray);
-                    var tileHits = this_1.blockingLayer.getRayCastTiles(ray, 4, true, false);
-                    if (tileHits.length > 0) {
-                        try {
-                            var results = [];
-                            results = ray.coordinatesOnLine(1, results);
-                            results.forEach(function (point) {
-                                tileHits.forEach(function (tile) {
-                                    if (tile.containsPoint(point[0], point[1])) {
-                                        ray.end.setTo(tile.worldX + 8, tile.worldY + 8);
-                                        _this.points.push(ray.end);
-                                        throw BreakException;
-                                    }
-                                });
-                            });
-                        }
-                        catch (e) {
-                            if (e !== BreakException)
-                                throw e;
-                        }
-                    }
-                    else {
-                        this_1.points.push(ray.end);
-                    }
-                };
-                var this_1 = this;
-                var rotation;
-                for (var i = 0; i < this.numberOfRays; i++) {
-                    _loop_1(i);
-                }
-            };
-            Fov.prototype.drawShadow = function () {
-                this.shadowTexture.context.beginPath();
-                for (var i = 0; i < this.points.length; i++) {
-                    var point = this.points[i];
-                    if (i == 0) {
-                        this.shadowTexture.context.moveTo(point.x, point.y);
-                    }
-                    else {
-                        this.shadowTexture.context.lineTo(point.x, point.y);
-                    }
-                }
-                this.shadowTexture.context.closePath();
-                // Draw circle of light with a soft edge
-                var circleGradient = this.shadowTexture.context.createRadialGradient(this.entity.x, this.entity.y, this.distance * 0.1, this.entity.x, this.entity.y, this.distance + this.game.rnd.integerInRange(-2, 1));
-                circleGradient.addColorStop(0, this.colorStop1 != null ? this.colorStop1 : 'rgba(255, 255, 255, 1.0)');
-                circleGradient.addColorStop(1, this.colorStop2 != null ? this.colorStop2 : 'rgba(255, 255, 255, 0.0)');
-                // var color = this.color != null ? this.color : "255, 255, 255";
-                // var colorTextBright = `rgba(${color}, 1.0)`;
-                // var colorTextDark = `rgba(${color}, 1.0)`;
-                // circleGradient.addColorStop(0, colorTextBright);
-                // circleGradient.addColorStop(1, colorTextDark);
-                // var linearGradient = this.shadowTexture.context.createLinearGradient(
-                //     this.mobile.x,
-                //     this.mobile.y,
-                //     this.mobile.position.x + this.distance * Math.cos(this.mobile.rotation),
-                //     this.mobile.position.y + this.distance * Math.sin(this.mobile.rotation));
-                // linearGradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
-                // linearGradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
-                this.shadowTexture.context.fillStyle = circleGradient; //'rgb(255, 255, 255)';
-                this.shadowTexture.context.fill();
-            };
-            Fov.prototype.update = function () {
-                _super.prototype.update.call(this);
-                this.rays = [];
-                this.points = [];
-                this.rayCast();
-                this.drawShadow();
-            };
-            Fov.prototype.debugRender = function () {
-                var _this = this;
-                if (this.debug) {
-                    this.rays.forEach(function (ray) {
-                        _this.game.debug.geom(ray);
-                    });
-                }
-            };
-            return Fov;
-        }(Components.BaseComponent));
-        Components.Fov = Fov;
-    })(Components = Darkworld.Components || (Darkworld.Components = {}));
-})(Darkworld || (Darkworld = {}));
-
-
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Darkworld;
-(function (Darkworld) {
-    var Components;
-    (function (Components) {
-        var KeyboardMovement = (function (_super) {
-            __extends(KeyboardMovement, _super);
-            function KeyboardMovement(game, mobile) {
-                _super.call(this, "KeyboardMovement");
-                this.game = game;
-                this.mobile = mobile;
-                this.keyboard = new Darkworld.Engines.InputHandler(game).keyboard;
-            }
-            KeyboardMovement.prototype.update = function () {
-                _super.prototype.update.call(this);
-                this.mobile.body.setZeroVelocity();
-                if (this.keyboard.isDown(Phaser.KeyCode.W)) {
-                    this.mobile.body.moveUp(this.mobile.speed);
-                }
-                if (this.keyboard.isDown(Phaser.KeyCode.S)) {
-                    this.mobile.body.moveDown(this.mobile.speed);
-                }
-                if (this.keyboard.isDown(Phaser.KeyCode.A)) {
-                    this.mobile.body.moveLeft(this.mobile.speed);
-                }
-                if (this.keyboard.isDown(Phaser.KeyCode.D)) {
-                    this.mobile.body.moveRight(this.mobile.speed);
-                }
-            };
-            return KeyboardMovement;
-        }(Components.BaseComponent));
-        Components.KeyboardMovement = KeyboardMovement;
-    })(Components = Darkworld.Components || (Darkworld.Components = {}));
-})(Darkworld || (Darkworld = {}));
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Darkworld;
-(function (Darkworld) {
-    var Components;
-    (function (Components) {
-        var LookAtMouse = (function (_super) {
-            __extends(LookAtMouse, _super);
-            function LookAtMouse(game, entity) {
-                _super.call(this, "LookAtMouse");
-                this.game = game;
-                this.entity = entity;
-                this.inputHandler = new Darkworld.Engines.InputHandler(game);
-                this.timeOfLastTween = 0;
-            }
-            LookAtMouse.prototype.update = function () {
-                _super.prototype.update.call(this);
-                this.entity.rotation = this.inputHandler.getAngleFrom(this.entity);
-                // if (this.game.time.elapsedSecondsSince(this.timeOfLastTween) >= 0.1) {
-                //     this.game.add.tween(this.entity).to({ rotation: this.anglePreviousFrame }, 500, Phaser.Easing.Sinusoidal.Out, true);
-                //     this.anglePreviousFrame = this.inputHandler.getAngleFrom(this.entity);
-                //     this.timeOfLastTween = this.game.time.time;                
-                // }
-            };
-            LookAtMouse.prototype.debugRender = function () {
-                _super.prototype.debugRender.call(this);
-            };
-            ;
-            return LookAtMouse;
-        }(Components.BaseComponent));
-        Components.LookAtMouse = LookAtMouse;
-    })(Components = Darkworld.Components || (Darkworld.Components = {}));
-})(Darkworld || (Darkworld = {}));
-
-var Darkworld;
-(function (Darkworld) {
     var Data;
     (function (Data) {
         var CellularAutomata = (function () {
@@ -103636,32 +103658,6 @@ var Darkworld;
     })(Data = Darkworld.Data || (Darkworld.Data = {}));
 })(Darkworld || (Darkworld = {}));
 
-var Darkworld;
-(function (Darkworld) {
-    var Engines;
-    (function (Engines) {
-        var InputHandler = (function () {
-            function InputHandler(game) {
-                this.game = game;
-                this.isEnabled = true;
-                this.actionButton = this.game.input.activePointer.leftButton;
-                this.selectButton = this.game.input.activePointer.rightButton;
-                this.keyboard = this.game.input.keyboard;
-            }
-            InputHandler.prototype.update = function () {
-                if (this.isEnabled) {
-                }
-            };
-            InputHandler.prototype.getAngleFrom = function (entity) {
-                return this.game.physics.arcade.angleToPointer(entity);
-                //return Math.atan2(this.game.input.activePointer.y - entity.worldPosition.y, this.game.input.activePointer.x - entity.worldPosition.x ) * (180/Math.PI);
-            };
-            return InputHandler;
-        }());
-        Engines.InputHandler = InputHandler;
-    })(Engines = Darkworld.Engines || (Darkworld.Engines = {}));
-})(Darkworld || (Darkworld = {}));
-
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -103728,6 +103724,32 @@ var Darkworld;
         }(Phaser.Sprite));
         Entities.Player = Player;
     })(Entities = Darkworld.Entities || (Darkworld.Entities = {}));
+})(Darkworld || (Darkworld = {}));
+
+var Darkworld;
+(function (Darkworld) {
+    var Engines;
+    (function (Engines) {
+        var InputHandler = (function () {
+            function InputHandler(game) {
+                this.game = game;
+                this.isEnabled = true;
+                this.actionButton = this.game.input.activePointer.leftButton;
+                this.selectButton = this.game.input.activePointer.rightButton;
+                this.keyboard = this.game.input.keyboard;
+            }
+            InputHandler.prototype.update = function () {
+                if (this.isEnabled) {
+                }
+            };
+            InputHandler.prototype.getAngleFrom = function (entity) {
+                return this.game.physics.arcade.angleToPointer(entity);
+                //return Math.atan2(this.game.input.activePointer.y - entity.worldPosition.y, this.game.input.activePointer.x - entity.worldPosition.x ) * (180/Math.PI);
+            };
+            return InputHandler;
+        }());
+        Engines.InputHandler = InputHandler;
+    })(Engines = Darkworld.Engines || (Darkworld.Engines = {}));
 })(Darkworld || (Darkworld = {}));
 
 var __extends = (this && this.__extends) || function (d, b) {
@@ -103861,9 +103883,14 @@ var Darkworld;
                 this.game.physics.startSystem(Phaser.Physics.P2JS);
                 this.game.dWorld = new Darkworld.Core.DWorld(this.game);
                 this.game.dWorld.addComponent(new Darkworld.Components.DayNightSystem(this.game));
+                //start day night cycle
+                var dayNightCycleComponent = this.game.dWorld.getComponent("DayNightSystem");
+                if (dayNightCycleComponent != null) {
+                    dayNightCycleComponent.startCycle();
+                }
                 this.player = this.game.dWorld.addPlayer(true);
-                var torch = new Darkworld.Entities.Items.Torch(this.game, 200, 200);
-                var torch1 = new Darkworld.Entities.Items.Torch(this.game, 500, 450);
+                // let torch = new Darkworld.Entities.Items.Torch(this.game,200,200);
+                // let torch1 = new Darkworld.Entities.Items.Torch(this.game,500,450);
             };
             Running.prototype.update = function () {
                 this.game.dWorld.update();
@@ -103875,6 +103902,38 @@ var Darkworld;
         }(Phaser.State));
         States.Running = Running;
     })(States = Darkworld.States || (Darkworld.States = {}));
+})(Darkworld || (Darkworld = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var Entities;
+    (function (Entities) {
+        var Mobiles;
+        (function (Mobiles) {
+            var Mobile = (function (_super) {
+                __extends(Mobile, _super);
+                function Mobile(game, x, y, key, frame) {
+                    _super.call(this, game, x, y, key, frame);
+                    this.speed = 100;
+                }
+                Mobile.prototype.update = function () {
+                    _super.prototype.update.call(this);
+                };
+                ;
+                Mobile.prototype.debugRender = function () {
+                    _super.prototype.debugRender.call(this);
+                };
+                ;
+                return Mobile;
+            }(Darkworld.Entities.Entity));
+            Mobiles.Mobile = Mobile;
+        })(Mobiles = Entities.Mobiles || (Entities.Mobiles = {}));
+    })(Entities = Darkworld.Entities || (Darkworld.Entities = {}));
 })(Darkworld || (Darkworld = {}));
 
 var __extends = (this && this.__extends) || function (d, b) {
@@ -103938,38 +103997,6 @@ var Darkworld;
             }(Darkworld.Entities.Entity));
             Items.Torch = Torch;
         })(Items = Entities.Items || (Entities.Items = {}));
-    })(Entities = Darkworld.Entities || (Darkworld.Entities = {}));
-})(Darkworld || (Darkworld = {}));
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Darkworld;
-(function (Darkworld) {
-    var Entities;
-    (function (Entities) {
-        var Mobiles;
-        (function (Mobiles) {
-            var Mobile = (function (_super) {
-                __extends(Mobile, _super);
-                function Mobile(game, x, y, key, frame) {
-                    _super.call(this, game, x, y, key, frame);
-                    this.speed = 100;
-                }
-                Mobile.prototype.update = function () {
-                    _super.prototype.update.call(this);
-                };
-                ;
-                Mobile.prototype.debugRender = function () {
-                    _super.prototype.debugRender.call(this);
-                };
-                ;
-                return Mobile;
-            }(Darkworld.Entities.Entity));
-            Mobiles.Mobile = Mobile;
-        })(Mobiles = Entities.Mobiles || (Entities.Mobiles = {}));
     })(Entities = Darkworld.Entities || (Darkworld.Entities = {}));
 })(Darkworld || (Darkworld = {}));
 
