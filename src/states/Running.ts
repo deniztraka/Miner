@@ -16,7 +16,7 @@ namespace Darkworld.States {
             //start day night cycle
             let dayNightCycleComponent = this.game.dWorld.getComponent("DayNightSystem") as Darkworld.Components.DayNightSystem; 
             if(dayNightCycleComponent != null){
-                dayNightCycleComponent.startCycle();
+                //dayNightCycleComponent.startCycle();
             }
 
             this.player = this.game.dWorld.addPlayer(true);            

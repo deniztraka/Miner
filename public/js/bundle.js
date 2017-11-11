@@ -102852,7 +102852,7 @@ var Darkworld;
                 _super.call(this, "DayNightSystem");
                 this.game = game;
                 this.debug = true;
-                this.dayLengthInSeconds = 60;
+                this.dayLengthInSeconds = 10;
                 this.elapsedRealSeconds = 0;
                 this.elapsedGameDays = 0;
                 this.currentGameHour = 0;
@@ -102915,6 +102915,8 @@ var Darkworld;
             DayNightSystem.prototype.update = function () {
                 _super.prototype.update.call(this);
                 this.currentGameHour = Math.floor((24 * this.elapsedRealSeconds / this.dayLengthInSeconds) % 24);
+                // this.shadowSprite.x = this.game.dWorld.player.x;
+                // this.shadowSprite.y = this.game.dWorld.player.y;
                 // if (this.currentGameHour < 6) {
                 //     this.currentShadowAlphaValue = 1;
                 // } else if (this.currentGameHour > 6 && this.currentGameHour < 18) {
@@ -102950,14 +102952,15 @@ var Darkworld;
     (function (Components) {
         var Fov = (function (_super) {
             __extends(Fov, _super);
-            function Fov(game, entity, colorStop1, colorStop2, distance) {
+            function Fov(game, entity, colorStop1, colorStop2, distance, isFullView) {
                 _super.call(this, "Fov");
                 this.colorStop1 = colorStop1;
                 this.colorStop2 = colorStop2;
                 this.game = game;
                 this.entity = entity;
                 this.blockingLayer = this.game.dWorld.tileMap.blockingLayer;
-                this.debug = false;
+                this.debug = true;
+                this.isFullView = isFullView;
                 this.dayNightSystemComponent = this.game.dWorld.getComponent("DayNightSystem");
                 this.numberOfRays = 30;
                 this.distance = distance != null ? distance : 75;
@@ -102965,7 +102968,7 @@ var Darkworld;
                 //  Here the sprite uses the BitmapData as a texture
                 this.shadowSprite = this.dayNightSystemComponent.shadowSprite;
                 // this.shadowSprite.blendMode = Phaser.blendModes.MULTIPLY;
-                this.shadowSprite.anchor.set(0.5);
+                //this.shadowSprite.anchor.set(0.5);
             }
             Fov.prototype.rayCast = function () {
                 var _this = this;
@@ -102985,7 +102988,17 @@ var Darkworld;
                             results.forEach(function (point) {
                                 tileHits.forEach(function (tile) {
                                     if (tile.containsPoint(point[0], point[1])) {
-                                        ray.end.setTo(tile.worldX + 8, tile.worldY + 8);
+                                        //ray.end.setTo(tile.worldX + 8, tile.worldY + 8);
+                                        if (!_this.isFullView) {
+                                            ray.end.setTo(point[0], point[1]);
+                                        }
+                                        // if (tile.worldY + tile.height / 2 < this.entity.y) {
+                                        //     //console.log("asd");
+                                        //     ray.end.setTo(tile.worldX + 8, tile.worldY + 8);
+                                        // } else {
+                                        //     //console.log("asd");
+                                        //     ray.end.setTo(point[0], point[1]);
+                                        // }
                                         _this.points.push(ray.end);
                                         throw BreakException;
                                     }
@@ -103008,9 +103021,12 @@ var Darkworld;
                 }
             };
             Fov.prototype.drawShadow = function () {
+                //console.log(this.shadowSprite.width + "-" + this.game.dWorld.tileMap.widthInPixels + "--" + new Phaser.Point(this.shadowSprite.width/this.game.dWorld.tileMap.widthInPixels * this.points[0].x,this.points[0].y).x + "-" + this.points[0].x );
+                //console.log(this.shadowSprite.width + "-" + this.game.dWorld.tileMap.widthInPixels + "--" + new Phaser.Point(this.shadowSprite.width/this.game.dWorld.tileMap.widthInPixels * this.points[0].x,this.points[0].y).x + "-" + this.points[0].x );
                 this.shadowTexture.context.beginPath();
                 for (var i = 0; i < this.points.length; i++) {
                     var point = this.points[i];
+                    //var point = new Phaser.Point(this.shadowSprite.width/this.game.dWorld.tileMap.widthInPixels * this.points[i].x,this.shadowSprite.height/this.game.dWorld.tileMap.heightInPixels * this.points[i].y);
                     if (i == 0) {
                         this.shadowTexture.context.moveTo(point.x, point.y);
                     }
@@ -103023,19 +103039,7 @@ var Darkworld;
                 var circleGradient = this.shadowTexture.context.createRadialGradient(this.entity.x, this.entity.y, this.distance * 0.1, this.entity.x, this.entity.y, this.distance + this.game.rnd.integerInRange(-2, 1));
                 circleGradient.addColorStop(0, this.colorStop1 != null ? this.colorStop1 : 'rgba(255, 255, 255, 1.0)');
                 circleGradient.addColorStop(1, this.colorStop2 != null ? this.colorStop2 : 'rgba(255, 255, 255, 0.0)');
-                // var color = this.color != null ? this.color : "255, 255, 255";
-                // var colorTextBright = `rgba(${color}, 1.0)`;
-                // var colorTextDark = `rgba(${color}, 1.0)`;
-                // circleGradient.addColorStop(0, colorTextBright);
-                // circleGradient.addColorStop(1, colorTextDark);
-                // var linearGradient = this.shadowTexture.context.createLinearGradient(
-                //     this.mobile.x,
-                //     this.mobile.y,
-                //     this.mobile.position.x + this.distance * Math.cos(this.mobile.rotation),
-                //     this.mobile.position.y + this.distance * Math.sin(this.mobile.rotation));
-                // linearGradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
-                // linearGradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
-                this.shadowTexture.context.fillStyle = circleGradient; //'rgb(255, 255, 255)';
+                this.shadowTexture.context.fillStyle = circleGradient;
                 this.shadowTexture.context.fill();
             };
             Fov.prototype.update = function () {
@@ -103196,10 +103200,11 @@ var Darkworld;
                 _super.call(this, game, key, tileWidth, tileHeight, width, height);
                 this.game = game;
                 //this.map.addTilesetImage("tile_floor_forest");
-                this.addTilesetImage("tile_floor_dungeon");
+                //this.addTilesetImage("tile_floor_dungeon");
+                this.addTilesetImage("tile_floor_dungeon_32x32");
                 //this.game.worldMap.addTilesetImage("tile_10");
-                this.floorLayer = this.create('floor', this.width, this.height, 16, 16);
-                this.blockingLayer = this.create('blocking', this.width, this.height, 16, 16);
+                this.floorLayer = this.create('floor', this.width, this.height, 32, 32);
+                this.blockingLayer = this.create('blocking', this.width, this.height, 32, 32);
                 this.blockingLayer.key = "blockingLayer";
                 this.floorLayer.resizeWorld();
                 //fill map random
@@ -103226,10 +103231,10 @@ var Darkworld;
             }
             /* Private Methods */
             DTileMap.prototype.updateMarker = function () {
-                var currentTile = this.getTileWorldXY(this.game.input.activePointer.worldX, this.game.input.activePointer.worldY, 16, 16);
+                var currentTile = this.getTileWorldXY(this.game.input.activePointer.worldX, this.game.input.activePointer.worldY, 32, 32);
                 if (currentTile != null) {
-                    this.marker.x = currentTile.x * 16;
-                    this.marker.y = currentTile.y * 16;
+                    this.marker.x = currentTile.x * 32;
+                    this.marker.y = currentTile.y * 32;
                 }
             };
             /* Public Methods */
@@ -103308,7 +103313,7 @@ var Darkworld;
             function DTileMarker(game, x, y) {
                 _super.call(this, game, x, y);
                 this.lineStyle(2, 0x000000, 1);
-                this.drawRect(0, 0, 16, 16);
+                this.drawRect(0, 0, 32, 32);
                 game.add.existing(this);
             }
             return DTileMarker;
@@ -103323,10 +103328,10 @@ var Darkworld;
     (function (Core) {
         var DWorld = (function () {
             function DWorld(game) {
-                this.mapHeight = 38; //38
-                this.mapWidth = 50; //60
+                this.mapHeight = 15; //38
+                this.mapWidth = 30; //60
                 this.game = game;
-                this.tileMap = new Core.DTileMap(this.game, null, 16, 16, this.mapWidth, this.mapHeight);
+                this.tileMap = new Core.DTileMap(this.game, null, 32, 32, this.mapWidth, this.mapHeight);
             }
             DWorld.prototype.addPlayer = function (isRandom, x, y) {
                 var playerSpawnPoint;
@@ -103738,6 +103743,7 @@ var Darkworld;
                 this.load.spritesheet('tile_floor_forest', './../img/tiles/EasyTiles.png', 16, 16);
                 this.load.spritesheet('tile_10', './../img/tiles/10.png', 16, 16);
                 this.load.spritesheet('tile_floor_dungeon', './../img/tiles/floor_broken.png', 16, 16);
+                this.load.spritesheet('tile_floor_dungeon_32x32', './../img/tiles/floor_broken_32x32.png', 32, 32);
                 this.load.image('playerImg', './../img/player.png');
             };
             Preloader.prototype.create = function () {
@@ -103772,7 +103778,6 @@ var Darkworld;
                 //start day night cycle
                 var dayNightCycleComponent = this.game.dWorld.getComponent("DayNightSystem");
                 if (dayNightCycleComponent != null) {
-                    dayNightCycleComponent.startCycle();
                 }
                 this.player = this.game.dWorld.addPlayer(true);
                 // let torch = new Darkworld.Entities.Items.Torch(this.game,200,200);
@@ -103837,7 +103842,7 @@ var Darkworld;
                 function Torch(game, x, y, key, frame) {
                     _super.call(this, game, x, y, key, frame);
                     this.fovDistance = 15;
-                    this.addComponent(new Darkworld.Components.Fov(game, this, 'rgba(255, 191, 0, 1.0)', 'rgba(255, 191, 0, 0.0)', 50));
+                    this.addComponents([new Darkworld.Components.Fov(game, this, 'rgba(255, 191, 0, 1.0)', 'rgba(255, 191, 0, 0.0)', 50)]);
                 }
                 Torch.prototype.update = function () {
                     _super.prototype.update.call(this);
@@ -103938,13 +103943,15 @@ var Darkworld;
                     function Player(game, x, y) {
                         _super.call(this, game, x, y, 'playerImg', null);
                         game.physics.p2.enable(this);
+                        this.speed = 250;
                         this.body.setZeroDamping();
                         this.body.fixedRotation = true;
                         //Add components here
                         this.addComponents([
                             new Darkworld.Components.LookAtMouse(game, this),
                             new Darkworld.Components.KeyboardMovement(game, this),
-                            new Darkworld.Components.Fov(game, this)
+                            new Darkworld.Components.Fov(game, this, 'rgba(255, 255, 255, 1.0)', 'rgba(255, 255, 255, 0.0)', 150, false),
+                            new Darkworld.Components.Fov(game, this, 'rgba(255, 255, 255, 0.4)', 'rgba(255, 255, 255, 0.0)', 75, true)
                         ]);
                         this.game.camera.follow(this);
                     }

@@ -4,7 +4,7 @@ namespace Darkworld.Entities.Items{
         constructor(game:Darkworld.DGame,x:number,y:number, key?: string | Phaser.RenderTexture | Phaser.BitmapData | PIXI.Texture, frame?: string | number){
             super(game,x,y,key,frame);            
             this.fovDistance = 15;
-            this.addComponent(new Darkworld.Components.Fov(game,this,'rgba(255, 191, 0, 1.0)','rgba(255, 191, 0, 0.0)',50))
+            this.addComponents([new Darkworld.Components.Fov(game,this,'rgba(255, 191, 0, 1.0)','rgba(255, 191, 0, 0.0)',50)])
         }
 
         

@@ -20,7 +20,7 @@ namespace Darkworld.Components {
 
             this.game = game;
             this.debug = true;
-            this.dayLengthInSeconds = 60;
+            this.dayLengthInSeconds = 10;
             this.elapsedRealSeconds = 0;
             this.elapsedGameDays = 0;
             this.currentGameHour = 0;
@@ -29,7 +29,7 @@ namespace Darkworld.Components {
 
             this.shadowTexture = this.game.make.bitmapData(this.game.width, this.game.height);
             //  Here the sprite uses the BitmapData as a texture
-            this.shadowSprite = this.game.add.sprite(this.game.width / 2, this.game.height / 2, this.shadowTexture);
+            this.shadowSprite = this.game.add.sprite(this.game.width/2, this.game.height/2, this.shadowTexture);
             this.shadowSprite.blendMode = Phaser.blendModes.MULTIPLY;
 
             this.shadowSprite.anchor.set(0.5);
@@ -97,6 +97,8 @@ namespace Darkworld.Components {
         update() {
             super.update();
             this.currentGameHour = Math.floor((24 * this.elapsedRealSeconds / this.dayLengthInSeconds) % 24);
+            // this.shadowSprite.x = this.game.dWorld.player.x;
+            // this.shadowSprite.y = this.game.dWorld.player.y;
 
 
 

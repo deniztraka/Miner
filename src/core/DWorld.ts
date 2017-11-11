@@ -9,11 +9,11 @@ namespace Darkworld.Core {
         player:Darkworld.Entities.Mobiles.Humanoids.Player;        
 
         constructor(game: Darkworld.DGame) {
-            this.mapHeight = 38;//38
-            this.mapWidth = 50;//60
+            this.mapHeight = 15;//38
+            this.mapWidth = 30;//60
             this.game = game;            
 
-            this.tileMap = new DTileMap(this.game, null, 16, 16, this.mapWidth, this.mapHeight);                       
+            this.tileMap = new DTileMap(this.game, null, 32, 32, this.mapWidth, this.mapHeight);                       
         }
 
         
