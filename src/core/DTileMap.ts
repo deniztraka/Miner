@@ -11,10 +11,11 @@ namespace Darkworld.Core {
             this.game = game;
             //this.map.addTilesetImage("tile_floor_forest");
             //this.addTilesetImage("tile_floor_dungeon");
-            this.addTilesetImage("tile_floor_dungeon_32x32");
+            //this.addTilesetImage("tile_floor_dungeon_32x32");
+            this.addTilesetImage("tile_floor_dungeon_64x64");
             //this.game.worldMap.addTilesetImage("tile_10");
-            this.floorLayer = this.create('floor', this.width, this.height, 32, 32);
-            this.blockingLayer  = this.create('blocking', this.width, this.height, 32, 32);            
+            this.floorLayer = this.create('floor', this.width, this.height, this.tileWidth, this.tileHeight);
+            this.blockingLayer  = this.create('blocking', this.width, this.height, this.tileWidth, this.tileHeight);            
             this.blockingLayer.key = "blockingLayer";
             this.floorLayer.resizeWorld();  
             
@@ -46,10 +47,10 @@ namespace Darkworld.Core {
 
         /* Private Methods */
         private updateMarker() {        
-            var currentTile = this.getTileWorldXY(this.game.input.activePointer.worldX, this.game.input.activePointer.worldY, 32, 32);
+            var currentTile = this.getTileWorldXY(this.game.input.activePointer.worldX, this.game.input.activePointer.worldY, this.tileWidth, this.tileHeight);
             if (currentTile != null) {
-                this.marker.x = currentTile.x * 32;
-                this.marker.y = currentTile.y * 32;
+                this.marker.x = currentTile.x * this.tileWidth;
+                this.marker.y = currentTile.y * this.tileHeight;
             }
         }
     
