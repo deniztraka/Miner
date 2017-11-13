@@ -9,14 +9,15 @@ namespace Darkworld.Components {
         private shadowTexture: Phaser.BitmapData;
         private shadowSprite: Phaser.Sprite;
         private debug: boolean;
+        private isFullView: boolean;
 
         blockingLayer: Phaser.TilemapLayer;
         distance: number;
-        dayNightSystemComponent:DayNightSystem;
-        colorStop1:string;
-        colorStop2:string;
+        dayNightSystemComponent: DayNightSystem;
+        colorStop1: string;
+        colorStop2: string;
 
-        constructor(game: Darkworld.DGame, entity: Darkworld.Entities.Entity,colorStop1?:string,colorStop2?:string,distance?:number) {
+        constructor(game: Darkworld.DGame, entity: Darkworld.Entities.Entity, colorStop1?: string, colorStop2?: string, distance?: number, isFullView?: boolean) {
             super("Fov");
             this.colorStop1 = colorStop1;
             this.colorStop2 = colorStop2;
@@ -24,16 +25,17 @@ namespace Darkworld.Components {
             this.entity = entity;
             this.blockingLayer = this.game.dWorld.tileMap.blockingLayer;
             this.debug = false;
+            this.isFullView = isFullView;
 
             this.dayNightSystemComponent = this.game.dWorld.getComponent("DayNightSystem") as DayNightSystem;
-            this.numberOfRays = 30;
+            this.numberOfRays = 250;
             this.distance = distance != null ? distance : 75;
             this.shadowTexture = this.dayNightSystemComponent.shadowTexture;
             //  Here the sprite uses the BitmapData as a texture
             this.shadowSprite = this.dayNightSystemComponent.shadowSprite;
             // this.shadowSprite.blendMode = Phaser.blendModes.MULTIPLY;
 
-            this.shadowSprite.anchor.set(0.5);
+            //this.shadowSprite.anchor.set(0.5);
         }
 
         private rayCast() {
@@ -60,9 +62,23 @@ namespace Darkworld.Components {
                         let results: any[] = [];
                         results = ray.coordinatesOnLine(1, results);
                         results.forEach(point => {
-                            tileHits.forEach(tile => {
+                            tileHits.forEach(tile => {                                
                                 if (tile.containsPoint(point[0], point[1])) {
-                                    ray.end.setTo(tile.worldX + 8, tile.worldY + 8);
+
+
+                                    //ray.end.setTo(tile.worldX + 8, tile.worldY + 8);
+                                    if (!this.isFullView) {
+                                        ray.end.setTo(point[0], point[1]);
+                                    }
+                                    // if (tile.worldY + tile.height / 2 < this.entity.y) {
+                                    //     //console.log("asd");
+                                    //     ray.end.setTo(tile.worldX + 8, tile.worldY + 8);
+                                    // } else {
+                                    //     //console.log("asd");
+                                    //     ray.end.setTo(point[0], point[1]);
+                                    // }
+
+                                    
                                     this.points.push(ray.end);
                                     throw BreakException;
                                 }
@@ -75,14 +91,15 @@ namespace Darkworld.Components {
                 else {
                     this.points.push(ray.end);
                 }
-            }            
+            }
         }
 
-        private drawShadow() {
-
+        private drawShadow() {                                 
             this.shadowTexture.context.beginPath();
             for (var i = 0; i < this.points.length; i++) {
-                var point = this.points[i];
+                //var point = this.points[i];
+                
+                var point = new Phaser.Point(this.points[i].x-this.game.camera.x,this.points[i].y-this.game.camera.y);                
                 if (i == 0) {
                     this.shadowTexture.context.moveTo(point.x, point.y);
                 } else {
@@ -93,28 +110,14 @@ namespace Darkworld.Components {
 
             // Draw circle of light with a soft edge
             var circleGradient = this.shadowTexture.context.createRadialGradient(
-                this.entity.x, this.entity.y, this.distance * 0.1,
-                this.entity.x, this.entity.y, this.distance + this.game.rnd.integerInRange(-2, 1));
+                this.entity.x-this.game.camera.x, this.entity.y-this.game.camera.y, this.distance * 0.1,
+                this.entity.x-this.game.camera.x, this.entity.y-this.game.camera.y, this.distance + this.game.rnd.integerInRange(-2, 1));
             circleGradient.addColorStop(0, this.colorStop1 != null ? this.colorStop1 : 'rgba(255, 255, 255, 1.0)');
-            circleGradient.addColorStop(1, this.colorStop2 != null ? this.colorStop2 :'rgba(255, 255, 255, 0.0)');
+            circleGradient.addColorStop(1, this.colorStop2 != null ? this.colorStop2 : 'rgba(255, 255, 255, 0.0)');
 
-            // var color = this.color != null ? this.color : "255, 255, 255";
-            // var colorTextBright = `rgba(${color}, 1.0)`;
-            // var colorTextDark = `rgba(${color}, 1.0)`;
+            
 
-            // circleGradient.addColorStop(0, colorTextBright);
-            // circleGradient.addColorStop(1, colorTextDark);
-
-
-            // var linearGradient = this.shadowTexture.context.createLinearGradient(
-            //     this.mobile.x,
-            //     this.mobile.y,
-            //     this.mobile.position.x + this.distance * Math.cos(this.mobile.rotation),
-            //     this.mobile.position.y + this.distance * Math.sin(this.mobile.rotation));
-            // linearGradient.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
-            // linearGradient.addColorStop(1, 'rgba(255, 255, 255, 0.0)');
-
-            this.shadowTexture.context.fillStyle = circleGradient;//'rgb(255, 255, 255)';
+            this.shadowTexture.context.fillStyle = circleGradient;
             this.shadowTexture.context.fill();
         }
 

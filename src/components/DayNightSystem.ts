@@ -12,6 +12,7 @@ namespace Darkworld.Components {
 
         shadowTexture: Phaser.BitmapData;
         shadowSprite: Phaser.Sprite;
+        shadowSprite2: Phaser.Sprite;
         blockingLayer: Phaser.TilemapLayer;
         distance: number;
 
@@ -20,7 +21,7 @@ namespace Darkworld.Components {
 
             this.game = game;
             this.debug = true;
-            this.dayLengthInSeconds = 60;
+            this.dayLengthInSeconds = 10;
             this.elapsedRealSeconds = 0;
             this.elapsedGameDays = 0;
             this.currentGameHour = 0;
@@ -29,10 +30,11 @@ namespace Darkworld.Components {
 
             this.shadowTexture = this.game.make.bitmapData(this.game.width, this.game.height);
             //  Here the sprite uses the BitmapData as a texture
-            this.shadowSprite = this.game.add.sprite(this.game.width / 2, this.game.height / 2, this.shadowTexture);
+            this.shadowSprite = this.game.add.sprite(this.game.width/2, this.game.height/2, this.shadowTexture);
             this.shadowSprite.blendMode = Phaser.blendModes.MULTIPLY;
 
-            this.shadowSprite.anchor.set(0.5);
+            this.shadowSprite.anchor.set(0.5);     
+            this.shadowSprite.fixedToCamera = true;       
         }
 
         private timerTick() {
@@ -61,7 +63,7 @@ namespace Darkworld.Components {
 
         private drawShadow() {
             this.shadowTexture.context.clearRect(0, 0, this.game.width, this.game.height);
-            this.shadowTexture.context.fillStyle = `rgba(10, 10, 10,${this.currentShadowAlphaValue.toString()})`; // 'rgba(10, 10, 10,0.5)';
+            this.shadowTexture.context.fillStyle = `rgba(5, 5, 5,${this.currentShadowAlphaValue.toString()})`; // 'rgba(10, 10, 10,0.5)';
             this.shadowTexture.context.fillRect(0, 0, this.game.width, this.game.height);
 
             this.shadowTexture.dirty = true;
@@ -97,6 +99,7 @@ namespace Darkworld.Components {
         update() {
             super.update();
             this.currentGameHour = Math.floor((24 * this.elapsedRealSeconds / this.dayLengthInSeconds) % 24);
+            
 
 
 

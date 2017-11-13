@@ -18,7 +18,7 @@ namespace Darkworld.Components{
             this.mobile.body.setZeroVelocity();
 
             if(this.keyboard.isDown(Phaser.KeyCode.W)) {
-                this.mobile.body.moveUp(this.mobile.speed);
+                this.mobile.body.moveUp(this.mobile.speed);                
             }
             if(this.keyboard.isDown(Phaser.KeyCode.S)) {
                 this.mobile.body.moveDown(this.mobile.speed);

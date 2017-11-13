@@ -2,6 +2,8 @@ namespace Darkworld.Core {
     export class DWorld {
         private customComponents:Array<Darkworld.Components.BaseComponent>;
 
+        tileResolution:number;
+        heightOfTheMapInTiles:number;
         tileMap: Darkworld.Core.DTileMap;
         game: Darkworld.DGame;
         mapHeight: number;
@@ -9,11 +11,12 @@ namespace Darkworld.Core {
         player:Darkworld.Entities.Mobiles.Humanoids.Player;        
 
         constructor(game: Darkworld.DGame) {
-            this.mapHeight = 38;//38
+            this.mapHeight = 50;//38
             this.mapWidth = 50;//60
+            this.tileResolution = 64;
             this.game = game;            
 
-            this.tileMap = new DTileMap(this.game, null, 16, 16, this.mapWidth, this.mapHeight);                       
+            this.tileMap = new DTileMap(this.game, null, this.tileResolution, this.tileResolution, this.mapWidth, this.mapHeight);                       
         }
 
         
