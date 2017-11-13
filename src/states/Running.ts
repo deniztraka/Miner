@@ -21,7 +21,7 @@ namespace Darkworld.States {
 
             this.player = this.game.dWorld.addPlayer(true);            
 
-            // let torch = new Darkworld.Entities.Items.Torch(this.game,200,200);
+             let torch = new Darkworld.Entities.Items.Torch(this.game,200,200);
 
             // let torch1 = new Darkworld.Entities.Items.Torch(this.game,500,450);
 
@@ -34,7 +34,7 @@ namespace Darkworld.States {
         }
 
         render() {
-            
+            this.game.debug.text(this.game.time.fps.toString() || '--', 2, 14, "#00ff00"); 
         }
 
 

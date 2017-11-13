@@ -24,11 +24,11 @@ namespace Darkworld.Components {
             this.game = game;
             this.entity = entity;
             this.blockingLayer = this.game.dWorld.tileMap.blockingLayer;
-            this.debug = true;
+            this.debug = false;
             this.isFullView = isFullView;
 
             this.dayNightSystemComponent = this.game.dWorld.getComponent("DayNightSystem") as DayNightSystem;
-            this.numberOfRays = 30;
+            this.numberOfRays = 250;
             this.distance = distance != null ? distance : 75;
             this.shadowTexture = this.dayNightSystemComponent.shadowTexture;
             //  Here the sprite uses the BitmapData as a texture
@@ -94,14 +94,12 @@ namespace Darkworld.Components {
             }
         }
 
-        private drawShadow() {
-            //console.log(this.shadowSprite.width + "-" + this.game.dWorld.tileMap.widthInPixels + "--" + new Phaser.Point(this.shadowSprite.width/this.game.dWorld.tileMap.widthInPixels * this.points[0].x,this.points[0].y).x + "-" + this.points[0].x );
-            //console.log(this.shadowSprite.width + "-" + this.game.dWorld.tileMap.widthInPixels + "--" + new Phaser.Point(this.shadowSprite.width/this.game.dWorld.tileMap.widthInPixels * this.points[0].x,this.points[0].y).x + "-" + this.points[0].x );
+        private drawShadow() {                                 
             this.shadowTexture.context.beginPath();
             for (var i = 0; i < this.points.length; i++) {
-                var point = this.points[i];
+                //var point = this.points[i];
                 
-                //var point = new Phaser.Point(this.shadowSprite.width/this.game.dWorld.tileMap.widthInPixels * this.points[i].x,this.shadowSprite.height/this.game.dWorld.tileMap.heightInPixels * this.points[i].y);
+                var point = new Phaser.Point(this.points[i].x-this.game.camera.x,this.points[i].y-this.game.camera.y);                
                 if (i == 0) {
                     this.shadowTexture.context.moveTo(point.x, point.y);
                 } else {
@@ -112,8 +110,8 @@ namespace Darkworld.Components {
 
             // Draw circle of light with a soft edge
             var circleGradient = this.shadowTexture.context.createRadialGradient(
-                this.entity.x, this.entity.y, this.distance * 0.1,
-                this.entity.x, this.entity.y, this.distance + this.game.rnd.integerInRange(-2, 1));
+                this.entity.x-this.game.camera.x, this.entity.y-this.game.camera.y, this.distance * 0.1,
+                this.entity.x-this.game.camera.x, this.entity.y-this.game.camera.y, this.distance + this.game.rnd.integerInRange(-2, 1));
             circleGradient.addColorStop(0, this.colorStop1 != null ? this.colorStop1 : 'rgba(255, 255, 255, 1.0)');
             circleGradient.addColorStop(1, this.colorStop2 != null ? this.colorStop2 : 'rgba(255, 255, 255, 0.0)');
 
