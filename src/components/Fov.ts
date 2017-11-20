@@ -13,6 +13,7 @@ namespace Darkworld.Components {
         protected offSetX: number;
         protected offSetY: number;
 
+        private addEntityPoint:boolean;
         blockingLayer: Phaser.TilemapLayer;
         distance: number;
         dayNightSystemComponent: DayNightSystem;
@@ -33,8 +34,9 @@ namespace Darkworld.Components {
             this.offSetY = offSetY;
 
             this.dayNightSystemComponent = this.game.dWorld.getComponent("DayNightSystem") as DayNightSystem;
-            this.numberOfRays = 60;
+            this.numberOfRays = 30;
             this.angle = angle != null ? angle : 360;
+            this.addEntityPoint = angle != null;
             this.distance = distance != null ? distance : 75;
             this.shadowTexture = this.dayNightSystemComponent.shadowTexture;
             //  Here the sprite uses the BitmapData as a texture
@@ -88,7 +90,7 @@ namespace Darkworld.Components {
                 }
             }
 
-            if (this.angle) {
+            if (this.addEntityPoint) {
 
                 this.points.push(this.entity.position);
             }
