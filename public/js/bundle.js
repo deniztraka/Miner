@@ -102949,6 +102949,54 @@ var Darkworld;
     Darkworld.Running = Running;
 })(Darkworld || (Darkworld = {}));
 
+// namespace Darkworld.Components {
+//     export class AngledFov extends Fov {     
+//         angle:number;          
+//         constructor(game: Darkworld.DGame, entity: Darkworld.Entities.Entity, offSetX:number, offSetY:number, angle:number, colorStop1?: string, colorStop2?: string, distance?: number, isFullView?: boolean) {
+//             super(game,entity,offSetX,offSetY,colorStop1,colorStop2,distance,isFullView);            
+//             this.angle = angle;
+//         }
+//         rayCast() {
+//             var BreakException = {};
+//             for (let i = 0; i < this.numberOfRays; i++) {
+//                 var rotation = (this.entity.rotation * 180/ Math.PI) + i * 360 / this.numberOfRays;
+//                 let ray = new Phaser.Line(
+//                     this.entity.position.x + this.offSetX,
+//                     this.entity.position.y + this.offSetX,
+//                     // this.mobile.position.x + this.distance * Math.cos(this.mobile.rotation - (0.2 + i * 0.15)),                    
+//                     // this.mobile.position.y + this.distance * Math.sin(this.mobile.rotation - (0.2 + i * 0.15)));
+//                     this.entity.position.x + this.offSetX + this.distance * Math.cos(rotation * (Math.PI / 180)),
+//                     this.entity.position.y + this.offSetX + this.distance * Math.sin(rotation * (Math.PI / 180)));
+//                 this.rays.push(ray);
+//                 let tileHits = this.blockingLayer.getRayCastTiles(ray, 4, true, false);
+//                 if (tileHits.length > 0) {
+//                     try {
+//                         let results: any[] = [];
+//                         results = ray.coordinatesOnLine(1, results);
+//                         results.forEach(point => {
+//                             tileHits.forEach(tile => {                                
+//                                 if (tile.containsPoint(point[0], point[1])) {
+//                                     //ray.end.setTo(tile.worldX + 8, tile.worldY + 8);
+//                                     if (!this.isFullView) {
+//                                         ray.end.setTo(point[0], point[1]);
+//                                     }
+//                                     this.points.push(ray.end);
+//                                     throw BreakException;
+//                                 }
+//                             });
+//                         });
+//                     } catch (e) {
+//                         if (e !== BreakException) throw e;
+//                     }
+//                 }
+//                 else {
+//                     this.points.push(ray.end);
+//                 }
+//             }
+//         }
+//     }
+// } 
+
 var Darkworld;
 (function (Darkworld) {
     var Components;
@@ -103084,7 +103132,7 @@ var Darkworld;
     (function (Components) {
         var Fov = (function (_super) {
             __extends(Fov, _super);
-            function Fov(game, entity, colorStop1, colorStop2, distance, isFullView) {
+            function Fov(game, entity, offSetX, offSetY, colorStop1, colorStop2, distance, isFullView, angle) {
                 _super.call(this, "Fov");
                 this.colorStop1 = colorStop1;
                 this.colorStop2 = colorStop2;
@@ -103093,24 +103141,24 @@ var Darkworld;
                 this.blockingLayer = this.game.dWorld.tileMap.blockingLayer;
                 this.debug = false;
                 this.isFullView = isFullView;
+                this.offSetX = offSetX;
+                this.offSetY = offSetY;
                 this.dayNightSystemComponent = this.game.dWorld.getComponent("DayNightSystem");
-                this.numberOfRays = 250;
+                this.numberOfRays = 60;
+                this.angle = angle != null ? angle : 360;
                 this.distance = distance != null ? distance : 75;
                 this.shadowTexture = this.dayNightSystemComponent.shadowTexture;
                 //  Here the sprite uses the BitmapData as a texture
                 this.shadowSprite = this.dayNightSystemComponent.shadowSprite;
-                // this.shadowSprite.blendMode = Phaser.blendModes.MULTIPLY;
-                //this.shadowSprite.anchor.set(0.5);
             }
             Fov.prototype.rayCast = function () {
                 var _this = this;
                 var BreakException = {};
                 var _loop_1 = function(i) {
-                    rotation = (this_1.entity.rotation * Math.PI / 180) + i * 360 / this_1.numberOfRays;
-                    var ray = new Phaser.Line(this_1.entity.position.x, this_1.entity.position.y, 
-                    // this.mobile.position.x + this.distance * Math.cos(this.mobile.rotation - (0.2 + i * 0.15)),                    
-                    // this.mobile.position.y + this.distance * Math.sin(this.mobile.rotation - (0.2 + i * 0.15)));
-                    this_1.entity.position.x + this_1.distance * Math.cos(rotation * (Math.PI / 180)), this_1.entity.position.y + this_1.distance * Math.sin(rotation * (Math.PI / 180)));
+                    rotationInDegrees = (this_1.entity.rotation * 180 / Math.PI);
+                    rotationInDegrees = rotationInDegrees - this_1.angle / 2;
+                    newRotationInDegrees = rotationInDegrees + i * this_1.angle / this_1.numberOfRays;
+                    var ray = new Phaser.Line(this_1.entity.position.x + this_1.offSetX, this_1.entity.position.y + this_1.offSetX, this_1.entity.position.x + this_1.offSetX + this_1.distance * Math.cos(newRotationInDegrees * (Math.PI / 180)), this_1.entity.position.y + this_1.offSetX + this_1.distance * Math.sin(newRotationInDegrees * (Math.PI / 180)));
                     this_1.rays.push(ray);
                     var tileHits = this_1.blockingLayer.getRayCastTiles(ray, 4, true, false);
                     if (tileHits.length > 0) {
@@ -103124,13 +103172,6 @@ var Darkworld;
                                         if (!_this.isFullView) {
                                             ray.end.setTo(point[0], point[1]);
                                         }
-                                        // if (tile.worldY + tile.height / 2 < this.entity.y) {
-                                        //     //console.log("asd");
-                                        //     ray.end.setTo(tile.worldX + 8, tile.worldY + 8);
-                                        // } else {
-                                        //     //console.log("asd");
-                                        //     ray.end.setTo(point[0], point[1]);
-                                        // }
                                         _this.points.push(ray.end);
                                         throw BreakException;
                                     }
@@ -103147,9 +103188,12 @@ var Darkworld;
                     }
                 };
                 var this_1 = this;
-                var rotation;
+                var rotationInDegrees, newRotationInDegrees;
                 for (var i = 0; i < this.numberOfRays; i++) {
                     _loop_1(i);
+                }
+                if (this.angle) {
+                    this.points.push(this.entity.position);
                 }
             };
             Fov.prototype.drawShadow = function () {
@@ -103166,7 +103210,7 @@ var Darkworld;
                 }
                 this.shadowTexture.context.closePath();
                 // Draw circle of light with a soft edge
-                var circleGradient = this.shadowTexture.context.createRadialGradient(this.entity.x - this.game.camera.x, this.entity.y - this.game.camera.y, this.distance * 0.1, this.entity.x - this.game.camera.x, this.entity.y - this.game.camera.y, this.distance + this.game.rnd.integerInRange(-2, 1));
+                var circleGradient = this.shadowTexture.context.createRadialGradient(this.entity.x - this.game.camera.x, this.entity.y - this.game.camera.y, this.distance * 0.1, this.entity.x - this.game.camera.x, this.entity.y - this.game.camera.y, this.distance + this.game.rnd.integerInRange(-5, 5));
                 circleGradient.addColorStop(0, this.colorStop1 != null ? this.colorStop1 : 'rgba(255, 255, 255, 1.0)');
                 circleGradient.addColorStop(1, this.colorStop2 != null ? this.colorStop2 : 'rgba(255, 255, 255, 0.0)');
                 this.shadowTexture.context.fillStyle = circleGradient;
@@ -103268,6 +103312,81 @@ var Darkworld;
             return LookAtMouse;
         }(Components.BaseComponent));
         Components.LookAtMouse = LookAtMouse;
+    })(Components = Darkworld.Components || (Darkworld.Components = {}));
+})(Darkworld || (Darkworld = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var Components;
+    (function (Components) {
+        var AngledFov = (function (_super) {
+            __extends(AngledFov, _super);
+            function AngledFov(game, entity, offSetX, offSetY, angle, colorStop1, colorStop2, distance, isFullView) {
+                _super.call(this, game, entity, offSetX, offSetY, colorStop1, colorStop2, distance, isFullView);
+                this.angle = angle;
+            }
+            AngledFov.prototype.rayCast = function () {
+                var _this = this;
+                var BreakException = {};
+                var _loop_1 = function(i) {
+                    rotation = (this_1.entity.rotation * 180 / Math.PI) + i * 360 / this_1.numberOfRays;
+                    var ray = new Phaser.Line(this_1.entity.position.x + this_1.offSetX, this_1.entity.position.y + this_1.offSetX, 
+                    // this.mobile.position.x + this.distance * Math.cos(this.mobile.rotation - (0.2 + i * 0.15)),                    
+                    // this.mobile.position.y + this.distance * Math.sin(this.mobile.rotation - (0.2 + i * 0.15)));
+                    this_1.entity.position.x + this_1.offSetX + this_1.distance * Math.cos(rotation * (Math.PI / 180)), this_1.entity.position.y + this_1.offSetX + this_1.distance * Math.sin(rotation * (Math.PI / 180)));
+                    this_1.rays.push(ray);
+                    var tileHits = this_1.blockingLayer.getRayCastTiles(ray, 4, true, false);
+                    if (tileHits.length > 0) {
+                        try {
+                            var results = [];
+                            results = ray.coordinatesOnLine(1, results);
+                            results.forEach(function (point) {
+                                tileHits.forEach(function (tile) {
+                                    if (tile.containsPoint(point[0], point[1])) {
+                                        //ray.end.setTo(tile.worldX + 8, tile.worldY + 8);
+                                        if (!_this.isFullView) {
+                                            ray.end.setTo(point[0], point[1]);
+                                        }
+                                        _this.points.push(ray.end);
+                                        throw BreakException;
+                                    }
+                                });
+                            });
+                        }
+                        catch (e) {
+                            if (e !== BreakException)
+                                throw e;
+                        }
+                    }
+                    else {
+                        this_1.points.push(ray.end);
+                    }
+                };
+                var this_1 = this;
+                var rotation;
+                for (var i = 0; i < this.numberOfRays; i++) {
+                    _loop_1(i);
+                }
+            };
+            AngledFov.prototype.update = function () {
+                _super.prototype.update.call(this);
+            };
+            AngledFov.prototype.debugRender = function () {
+                var _this = this;
+                if (this.debug) {
+                    this.rays.forEach(function (ray) {
+                        _this.game.debug.geom(ray);
+                    });
+                }
+            };
+            return AngledFov;
+        }(Components.Fov));
+        Components.AngledFov = AngledFov;
     })(Components = Darkworld.Components || (Darkworld.Components = {}));
 })(Darkworld || (Darkworld = {}));
 
@@ -103701,6 +103820,32 @@ var Darkworld;
     })(Core = Darkworld.Core || (Darkworld.Core = {}));
 })(Darkworld || (Darkworld = {}));
 
+var Darkworld;
+(function (Darkworld) {
+    var Engines;
+    (function (Engines) {
+        var InputHandler = (function () {
+            function InputHandler(game) {
+                this.game = game;
+                this.isEnabled = true;
+                this.actionButton = this.game.input.activePointer.leftButton;
+                this.selectButton = this.game.input.activePointer.rightButton;
+                this.keyboard = this.game.input.keyboard;
+            }
+            InputHandler.prototype.update = function () {
+                if (this.isEnabled) {
+                }
+            };
+            InputHandler.prototype.getAngleFrom = function (entity) {
+                return this.game.physics.arcade.angleToPointer(entity);
+                //return Math.atan2(this.game.input.activePointer.y - entity.worldPosition.y, this.game.input.activePointer.x - entity.worldPosition.x ) * (180/Math.PI);
+            };
+            return InputHandler;
+        }());
+        Engines.InputHandler = InputHandler;
+    })(Engines = Darkworld.Engines || (Darkworld.Engines = {}));
+})(Darkworld || (Darkworld = {}));
+
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -103767,32 +103912,6 @@ var Darkworld;
         }(Phaser.Sprite));
         Entities.Player = Player;
     })(Entities = Darkworld.Entities || (Darkworld.Entities = {}));
-})(Darkworld || (Darkworld = {}));
-
-var Darkworld;
-(function (Darkworld) {
-    var Engines;
-    (function (Engines) {
-        var InputHandler = (function () {
-            function InputHandler(game) {
-                this.game = game;
-                this.isEnabled = true;
-                this.actionButton = this.game.input.activePointer.leftButton;
-                this.selectButton = this.game.input.activePointer.rightButton;
-                this.keyboard = this.game.input.keyboard;
-            }
-            InputHandler.prototype.update = function () {
-                if (this.isEnabled) {
-                }
-            };
-            InputHandler.prototype.getAngleFrom = function (entity) {
-                return this.game.physics.arcade.angleToPointer(entity);
-                //return Math.atan2(this.game.input.activePointer.y - entity.worldPosition.y, this.game.input.activePointer.x - entity.worldPosition.x ) * (180/Math.PI);
-            };
-            return InputHandler;
-        }());
-        Engines.InputHandler = InputHandler;
-    })(Engines = Darkworld.Engines || (Darkworld.Engines = {}));
 })(Darkworld || (Darkworld = {}));
 
 var __extends = (this && this.__extends) || function (d, b) {
@@ -103998,7 +104117,7 @@ var Darkworld;
                 function Torch(game, x, y, key, frame) {
                     _super.call(this, game, x, y, key, frame);
                     this.fovDistance = 15;
-                    this.addComponents([new Darkworld.Components.Fov(game, this, 'rgba(255, 191, 0, 1.0)', 'rgba(255, 191, 0, 0.0)', 50)]);
+                    this.addComponents([new Darkworld.Components.Fov(game, this, 0, 0, 'rgba(255, 191, 0, 1.0)', 'rgba(255, 191, 0, 0.0)', 50)]);
                 }
                 Torch.prototype.update = function () {
                     _super.prototype.update.call(this);
@@ -104108,8 +104227,8 @@ var Darkworld;
                         this.addComponents([
                             new Darkworld.Components.LookAtMouse(game, this),
                             new Darkworld.Components.KeyboardMovement(game, this),
-                            new Darkworld.Components.Fov(game, this, 'rgba(255, 255, 255, 1.0)', 'rgba(255, 255, 255, 0.0)', 250, false),
-                            new Darkworld.Components.Fov(game, this, 'rgba(255, 255, 255, 0.4)', 'rgba(255, 255, 255, 0.0)', 75, true)
+                            new Darkworld.Components.Fov(game, this, 0, 0, 'rgba(252, 233, 106, 1.0)', 'rgba(255, 255, 255, 0.0)', 350, false, 60),
+                            new Darkworld.Components.Fov(game, this, 0, 0, 'rgba(252, 233, 106, 0.4)', 'rgba(255, 255, 255, 0.0)', 50, true)
                         ]);
                         this.game.camera.follow(this);
                     }
