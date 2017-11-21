@@ -20,8 +20,9 @@ namespace Darkworld.Components {
         colorStop1: string;
         colorStop2: string;
         angle: number;
+        flare: boolean;
 
-        constructor(game: Darkworld.DGame, entity: Darkworld.Entities.Entity, offSetX: number, offSetY: number, colorStop1?: string, colorStop2?: string, distance?: number, isFullView?: boolean, angle?: number) {
+        constructor(game: Darkworld.DGame, entity: Darkworld.Entities.Entity, offSetX: number, offSetY: number, colorStop1?: string, colorStop2?: string, distance?: number, isFullView?: boolean, angle?: number, flare?:boolean) {
             super("Fov");
             this.colorStop1 = colorStop1;
             this.colorStop2 = colorStop2;
@@ -34,8 +35,9 @@ namespace Darkworld.Components {
             this.offSetY = offSetY;
 
             this.dayNightSystemComponent = this.game.dWorld.getComponent("DayNightSystem") as DayNightSystem;
-            this.numberOfRays = 30;
+            this.numberOfRays = 25;
             this.angle = angle != null ? angle : 360;
+            this.flare = flare != null ? flare : false;
             this.addEntityPoint = angle != null;
             this.distance = distance != null ? distance : 75;
             this.shadowTexture = this.dayNightSystemComponent.shadowTexture;
@@ -54,9 +56,9 @@ namespace Darkworld.Components {
 
                 let ray = new Phaser.Line(
                     this.entity.position.x + this.offSetX,
-                    this.entity.position.y + this.offSetX,
+                    this.entity.position.y + this.offSetY,
                     this.entity.position.x + this.offSetX + this.distance * Math.cos(newRotationInDegrees * (Math.PI / 180)),
-                    this.entity.position.y + this.offSetX + this.distance * Math.sin(newRotationInDegrees * (Math.PI / 180)));
+                    this.entity.position.y + this.offSetY + this.distance * Math.sin(newRotationInDegrees * (Math.PI / 180)));
 
                 this.rays.push(ray);
 
@@ -113,7 +115,7 @@ namespace Darkworld.Components {
             // Draw circle of light with a soft edge
             var circleGradient = this.shadowTexture.context.createRadialGradient(
                 this.entity.x - this.game.camera.x, this.entity.y - this.game.camera.y, this.distance * 0.1,
-                this.entity.x - this.game.camera.x, this.entity.y - this.game.camera.y, this.distance + this.game.rnd.integerInRange(-5, 5));
+                this.entity.x - this.game.camera.x, this.entity.y - this.game.camera.y, this.distance + (this.flare ? this.game.rnd.integerInRange(-25, 5) : 0 ));
             circleGradient.addColorStop(0, this.colorStop1 != null ? this.colorStop1 : 'rgba(255, 255, 255, 1.0)');
             circleGradient.addColorStop(1, this.colorStop2 != null ? this.colorStop2 : 'rgba(255, 255, 255, 0.0)');
 
