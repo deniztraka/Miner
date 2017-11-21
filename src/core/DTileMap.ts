@@ -24,10 +24,10 @@ namespace Darkworld.Core {
             let cellularAutomataGenerator = new Darkworld.Data.CellularAutomata(this.game, this.width, this.height, 0.4, 3, 4);
             let randomTileMapData = cellularAutomataGenerator.generateMap(2, true);
 
-            //fill with grass first
+            //fill with floor first
             for (var i = 0; i < randomTileMapData.length; i++) {
                 for (var j = 0; j < randomTileMapData[i].length; j++) {
-                    this.putTile(this.game.rnd.integerInRange(0,64), i, j);//.alpha = 0;;
+                    this.putTile(this.game.rnd.integerInRange(Darkworld.Utils.TileSetIndex.Dungeon.FloorStart,Darkworld.Utils.TileSetIndex.Dungeon.FloorEnd), i, j);//.alpha = 0;;
                 }
             }
 
@@ -35,13 +35,13 @@ namespace Darkworld.Core {
             for (var i = 0; i < randomTileMapData.length; i++) {
                 for (var j = 0; j < randomTileMapData[i].length; j++) {
                     if (randomTileMapData[i][j] == 1) {
-                        var tile = this.putTile(64, i, j, this.blockingLayer);
+                        var tile = this.putTile(Darkworld.Utils.TileSetIndex.Dungeon.WallStart, i, j, this.blockingLayer);
                     }
                 }
             }
 
             this.enableTileMarker();
-            this.setCollision([64]);
+            this.setCollision([Darkworld.Utils.TileSetIndex.Dungeon.WallStart]);
             this.game.physics.p2.convertTilemap(this, this.blockingLayer);
         }
 
