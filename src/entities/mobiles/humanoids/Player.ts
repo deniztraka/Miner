@@ -12,7 +12,7 @@ namespace Darkworld.Entities.Mobiles.Humanoids{
                 new Darkworld.Components.LookAtMouse(game,this),
                 new Darkworld.Components.KeyboardMovement(game,this)                
             ]); 
-            this.addFov();
+            // this.addFov();
             
             this.game.camera.follow(this);
         }
