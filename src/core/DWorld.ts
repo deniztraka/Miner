@@ -11,8 +11,8 @@ namespace Darkworld.Core {
         player:Darkworld.Entities.Mobiles.Humanoids.Player;        
 
         constructor(game: Darkworld.DGame) {
-            this.mapHeight = 10;//38
-            this.mapWidth = 10;//60
+            this.mapHeight = 38;//38
+            this.mapWidth = 60;//60
             this.tileResolution = 64;
             this.game = game;            
 

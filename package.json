@@ -13,7 +13,10 @@
     "author": " <deniz.traka@gmail.com>",
     "license": "ISC",
     "dependencies": {
-        "express": "^4.14.0"
+        "@types/socket.io": "^1.4.31",
+        "@types/socket.io-client": "^1.4.32",
+        "express": "^4.14.0",
+        "socket.io": "~2.0.3"
     },
     "devDependencies": {
         "eslint": "^3.3.1",
@@ -36,15 +39,17 @@
         "node": "7.1.0"
     },
     "eslintConfig": {
-        "overrides": [{
-            "files": [
-                "build/*.js",
-                "lib/*.js"
-            ],
-            "excludedFiles": [
-                "node_modules/*.js"
-            ]
-        }],
+        "overrides": [
+            {
+                "files": [
+                    "build/*.js",
+                    "lib/*.js"
+                ],
+                "excludedFiles": [
+                    "node_modules/*.js"
+                ]
+            }
+        ],
         "env": {
             "es6": true
         }
