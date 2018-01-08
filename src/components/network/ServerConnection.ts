@@ -4,7 +4,7 @@ namespace Darkworld.Components {
     export class ServerConnection extends Darkworld.Components.BaseComponent implements Darkworld.Components.IComponent {
         private game: Darkworld.DGame;
         private player: Darkworld.Entities.Mobiles.Humanoids.Player;
-        private clientSocket : any;
+        private clientSocket : SocketIOClient.Socket;
 
         constructor(game: Darkworld.DGame, player: Darkworld.Entities.Mobiles.Humanoids.Player) {
             super("ServerConnection");
