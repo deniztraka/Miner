@@ -21,7 +21,7 @@ io.on('connection', function(socket) {
     console.log("got connection");
     socket.on('disconnect', function() {
 
-        console.log("got disconnect");
+        console.log("got disconnect asasd");
 
     });
 });
