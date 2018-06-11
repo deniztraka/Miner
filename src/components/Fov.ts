@@ -13,7 +13,7 @@ namespace Darkworld.Components {
         protected offSetX: number;
         protected offSetY: number;
 
-        private addEntityPoint:boolean;
+        private addEntityPoint: boolean;
         blockingLayer: Phaser.TilemapLayer;
         distance: number;
         dayNightSystemComponent: DayNightSystem;
@@ -22,7 +22,7 @@ namespace Darkworld.Components {
         angle: number;
         flare: boolean;
 
-        constructor(game: Darkworld.DGame, entity: Darkworld.Entities.Entity, offSetX: number, offSetY: number, colorStop1?: string, colorStop2?: string, distance?: number, isFullView?: boolean, angle?: number, flare?:boolean) {
+        constructor(game: Darkworld.DGame, entity: Darkworld.Entities.Entity, offSetX: number, offSetY: number, colorStop1?: string, colorStop2?: string, distance?: number, isFullView?: boolean, angle?: number, flare?: boolean) {
             super("Fov");
             this.colorStop1 = colorStop1;
             this.colorStop2 = colorStop2;
@@ -35,14 +35,16 @@ namespace Darkworld.Components {
             this.offSetY = offSetY;
 
             this.dayNightSystemComponent = this.game.dWorld.getComponent("DayNightSystem") as DayNightSystem;
-            this.numberOfRays = 25;
+            this.numberOfRays = 100;
             this.angle = angle != null ? angle : 360;
             this.flare = flare != null ? flare : false;
             this.addEntityPoint = angle != null;
             this.distance = distance != null ? distance : 75;
-            this.shadowTexture = this.dayNightSystemComponent.shadowTexture;
-            //  Here the sprite uses the BitmapData as a texture
-            this.shadowSprite = this.dayNightSystemComponent.shadowSprite;
+            if (this.dayNightSystemComponent) {
+                this.shadowTexture = this.dayNightSystemComponent.shadowTexture;
+                //  Here the sprite uses the BitmapData as a texture
+                this.shadowSprite = this.dayNightSystemComponent.shadowSprite;
+            }
         }
 
         protected rayCast() {
@@ -115,7 +117,7 @@ namespace Darkworld.Components {
             // Draw circle of light with a soft edge
             var circleGradient = this.shadowTexture.context.createRadialGradient(
                 this.entity.x - this.game.camera.x, this.entity.y - this.game.camera.y, this.distance * 0.1,
-                this.entity.x - this.game.camera.x, this.entity.y - this.game.camera.y, this.distance + (this.flare ? this.game.rnd.integerInRange(-25, 5) : 0 ));
+                this.entity.x - this.game.camera.x, this.entity.y - this.game.camera.y, this.distance + (this.flare ? this.game.rnd.integerInRange(-25, 5) : 0));
             circleGradient.addColorStop(0, this.colorStop1 != null ? this.colorStop1 : 'rgba(255, 255, 255, 1.0)');
             circleGradient.addColorStop(1, this.colorStop2 != null ? this.colorStop2 : 'rgba(255, 255, 255, 0.0)');
 
@@ -126,25 +128,33 @@ namespace Darkworld.Components {
         }
 
         update() {
-            super.update();
+            if (this.dayNightSystemComponent) {
+                super.update();
 
-            this.rays = [];
-            this.points = [];
+                this.rays = [];
+                this.points = [];
 
-            this.rayCast();
-            this.drawShadow();
+                this.rayCast();
+                this.drawShadow();
 
-
+            }
         }
 
 
 
         debugRender() {
-            if (this.debug) {
-                this.rays.forEach(ray => {
-                    this.game.debug.geom(ray);
-                });
+            if (!this.debug) {
+                return;
             }
+
+            if (!this.rays) {
+                return;
+            }
+
+            this.rays.forEach(ray => {
+                this.game.debug.geom(ray);
+            });
+
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Darkworld.Core {
             //this.map.addTilesetImage("tile_floor_forest");
             //this.addTilesetImage("tile_floor_dungeon");
             //this.addTilesetImage("tile_floor_dungeon_32x32");
-            this.addTilesetImage("tile_floor_dungeon_64x64");
+            this.addTilesetImage("tile_floor_dungeon_64x64_fov");
             //this.game.worldMap.addTilesetImage("tile_10");
             this.floorLayer = this.create('floor', this.width, this.height, this.tileWidth, this.tileHeight);
             this.blockingLayer  = this.create('blocking', this.width, this.height, this.tileWidth, this.tileHeight);            
@@ -63,7 +63,7 @@ namespace Darkworld.Core {
 
         putTile(tile: any, x: number, y: number, layer?: any): Darkworld.Core.DTile{
             if (tile === null) {
-                return this.removeTile(x, y, layer);
+                return this.removeTile(x, y, layer) as DTile;
             }
     
             layer = this.getLayer(layer);
@@ -124,5 +124,9 @@ namespace Darkworld.Core {
 
             return openCellPoint;
         }
+
+        update(){
+            
+        }        
     }
 }

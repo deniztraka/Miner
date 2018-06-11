@@ -12,6 +12,7 @@ namespace Darkworld.States {
             this.load.spritesheet('tile_floor_dungeon', './../img/tiles/floor_broken.png', 16, 16);
             this.load.spritesheet('tile_floor_dungeon_32x32', './../img/tiles/floor_broken_32x32.png', 32, 32);
             this.load.spritesheet('tile_floor_dungeon_64x64', './../img/tiles/floor_broken_64x64.png', 64, 64);
+            this.load.spritesheet('tile_floor_dungeon_64x64_fov', './../img/tiles/floor_broken_64x64_fov.png', 64, 64);
             this.load.image('playerImg', './../img/player.png');
         }
 

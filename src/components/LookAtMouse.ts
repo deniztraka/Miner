@@ -21,15 +21,15 @@ namespace Darkworld.Components {
         update() {
             super.update();
                 
-            //this.entity.rotation = this.inputHandler.getAngleFrom(this.entity);
+            this.entity.rotation = this.inputHandler.getAngleFrom(this.entity);
 
-            if (this.game.time.elapsedSecondsSince(this.timeOfLastTween) >= 0.1) {
+            // if (this.game.time.elapsedSecondsSince(this.timeOfLastTween) >= 0.1) {
 
-                this.game.add.tween(this.entity).to({ rotation: this.anglePreviousFrame }, 250, Phaser.Easing.Sinusoidal.Out, true);
+            //     this.game.add.tween(this.entity).to({ rotation: this.anglePreviousFrame }, 250, Phaser.Easing.Sinusoidal.Out, true);
                
-                this.anglePreviousFrame = this.inputHandler.getAngleFrom(this.entity);
-                this.timeOfLastTween = this.game.time.time;                
-            }
+            //     this.anglePreviousFrame = this.inputHandler.getAngleFrom(this.entity);
+            //     this.timeOfLastTween = this.game.time.time;                
+            // }
         }
 
         debugRender(){

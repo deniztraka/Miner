@@ -19,15 +19,15 @@ namespace Darkworld.States {
 
             //start day night cycle
             let dayNightCycleComponent = this.game.dWorld.getComponent("DayNightSystem") as Darkworld.Components.DayNightSystem;
-            if (dayNightCycleComponent != null) {
+            //if (dayNightCycleComponent != null) {
                 //dayNightCycleComponent.startCycle();
-            }
+            //}
 
             this.player = this.game.dWorld.addPlayer(true);
 
-            let torch = new Darkworld.Entities.Items.Torch(this.game, 200, 200);
+            //let torch = new Darkworld.Entities.Items.Torch(this.game, 200, 200);
 
-            let torch1 = new Darkworld.Entities.Items.Torch(this.game,500,450);
+            //let torch1 = new Darkworld.Entities.Items.Torch(this.game,500,450);
 
 
         }
