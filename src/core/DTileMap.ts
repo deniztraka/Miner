@@ -47,10 +47,14 @@ namespace Darkworld.Core {
 
         /* Private Methods */
         private updateMarker() {
-            var currentTile = this.getTileWorldXY(this.game.input.activePointer.worldX, this.game.input.activePointer.worldY, this.tileWidth, this.tileHeight);
+            var currentTile = this.getTileWorldXY(this.game.input.activePointer.worldX, this.game.input.activePointer.worldY, this.tileWidth, this.tileHeight) as Darkworld.Core.DTile;
             if (currentTile != null) {
                 this.marker.x = currentTile.x * this.tileWidth;
                 this.marker.y = currentTile.y * this.tileHeight;
+
+                if(this.game.input.activePointer.isDown){
+                    console.log("x:"+currentTile.x+", y:"+currentTile.y + ", show:" + currentTile.show + ", alpha:" + currentTile.alpha);
+                }
             }
         }
 
@@ -58,7 +62,7 @@ namespace Darkworld.Core {
         /* Public Methods */
         enableTileMarker() {
             this.marker = new DTileMarker(this.game);
-            this.game.input.addMoveCallback(this.updateMarker, this);
+            this.game.input.addMoveCallback(this.updateMarker, this);            
         }
 
         putTile(tile: any, x: number, y: number, layer?: any): Darkworld.Core.DTile {
