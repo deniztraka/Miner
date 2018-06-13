@@ -17,17 +17,17 @@ namespace Darkworld.States {
             this.game.dWorld = new Darkworld.Core.DWorld(this.game);
             this.game.dWorld.addComponent(new Darkworld.Components.DayNightSystem(this.game));
 
-            //start day night cycle
+            //start day night cycle asdasd
             let dayNightCycleComponent = this.game.dWorld.getComponent("DayNightSystem") as Darkworld.Components.DayNightSystem;
-            //if (dayNightCycleComponent != null) {
-                //dayNightCycleComponent.startCycle();
-            //}
-
+            if (dayNightCycleComponent != null) {
+                dayNightCycleComponent.startCycle();
+            } 
+  
             this.player = this.game.dWorld.addPlayer(true);
 
-            //let torch = new Darkworld.Entities.Items.Torch(this.game, 200, 200);
+            let torch = new Darkworld.Entities.Items.Torch(this.game, this.player.x+50, this.player.y+50);
 
-            //let torch1 = new Darkworld.Entities.Items.Torch(this.game,500,450);
+            let torch1 = new Darkworld.Entities.Items.Torch(this.game,500,450);
 
 
         }
