@@ -5,8 +5,8 @@ namespace Darkworld.Components {
         private dayLengthInSeconds: number;
         private elapsedRealSeconds: number;
         private currentShadowAlphaValue: number;
-        private changing:boolean;
-        
+        private changing: boolean;
+
         elapsedGameDays: number;
         currentGameHour: number;
 
@@ -15,26 +15,28 @@ namespace Darkworld.Components {
         shadowSprite2: Phaser.Sprite;
         blockingLayer: Phaser.TilemapLayer;
         distance: number;
+        isDay: boolean;
 
         constructor(game: Darkworld.DGame) {
             super("DayNightSystem");
 
             this.game = game;
             this.debug = true;
-            this.dayLengthInSeconds = 10;
+            this.dayLengthInSeconds = 60;
             this.elapsedRealSeconds = 0;
             this.elapsedGameDays = 0;
             this.currentGameHour = 0;
             this.currentShadowAlphaValue = 1;
             this.changing = false;
+            this.isDay = false;
 
             this.shadowTexture = this.game.make.bitmapData(this.game.width, this.game.height);
             //  Here the sprite uses the BitmapData as a texture
-            this.shadowSprite = this.game.add.sprite(this.game.width/2, this.game.height/2, this.shadowTexture);
+            this.shadowSprite = this.game.add.sprite(this.game.width / 2, this.game.height / 2, this.shadowTexture);
             this.shadowSprite.blendMode = Phaser.blendModes.MULTIPLY;
 
-            this.shadowSprite.anchor.set(0.5);     
-            this.shadowSprite.fixedToCamera = true;       
+            this.shadowSprite.anchor.set(0.5);
+            this.shadowSprite.fixedToCamera = true;
         }
 
         private timerTick() {
@@ -50,10 +52,10 @@ namespace Darkworld.Components {
             //     "Current Game Hours:" + this.currentGameHour + "\n" +
             //     "Current Shadow Alpha Value:" + this.currentShadowAlphaValue + "\n"
             // );
-            
-            if((!this.changing) && this.currentGameHour>6 && this.currentGameHour<18 && this.currentShadowAlphaValue != 0){
+
+            if ((!this.changing) && this.currentGameHour > 6 && this.currentGameHour < 18 && this.currentShadowAlphaValue != 0) {
                 this.game.time.events.add(0, this.changeToDay, this);
-            } else if((!this.changing) && this.currentGameHour>18 && this.currentGameHour>6 && this.currentShadowAlphaValue != 1){
+            } else if ((!this.changing) && this.currentGameHour > 18 && this.currentGameHour > 6 && this.currentShadowAlphaValue != 1) {
                 this.game.time.events.add(0, this.changeToNight, this);
             }
 
@@ -73,33 +75,41 @@ namespace Darkworld.Components {
             this.game.time.events.add(Phaser.Timer.SECOND * 1, this.timerTick, this);
         }
 
-        setToNotChanging(){
+        setToNotChanging() {
             //console.log("complete");
-            this.changing=false;            
+            this.changing = false;
         }
 
-        changeToDay(){            
+        changeToDay() {
+            var self = this;
             //console.log("change to day");
-            let duration = this.dayLengthInSeconds*4/24*1000;            
+            let duration = this.dayLengthInSeconds * 4 / 24 * 1000;
             this.changing = true;
-            let tween = this.game.add.tween(this).to({currentShadowAlphaValue:0},duration,Phaser.Easing.Linear.None);
-            tween.onComplete.add(this.setToNotChanging,this);
+            let tween = this.game.add.tween(this).to({ currentShadowAlphaValue: 0 }, duration, Phaser.Easing.Linear.None);
+            tween.onComplete.add(this.setToNotChanging, this);
+            tween.onComplete.add(function () {
+                self.isDay = true;
+            });
             tween.start();
         }
 
-        changeToNight(){            
+        changeToNight() {
+            var self = this;
             //console.log("change to night");
-            let duration = this.dayLengthInSeconds*4/24*1000;            
+            let duration = this.dayLengthInSeconds * 4 / 24 * 1000;
             this.changing = true;
-            let tween = this.game.add.tween(this).to({currentShadowAlphaValue:1},duration,Phaser.Easing.Linear.None);
-            tween.onComplete.add(this.setToNotChanging,this);
+            let tween = this.game.add.tween(this).to({ currentShadowAlphaValue: 1 }, duration, Phaser.Easing.Linear.None);
+            tween.onComplete.add(this.setToNotChanging, this);
+            tween.onComplete.add(function () {
+                self.isDay = false;
+            });
             tween.start();
         }
 
         update() {
             super.update();
             this.currentGameHour = Math.floor((24 * this.elapsedRealSeconds / this.dayLengthInSeconds) % 24);
-            
+
 
 
 

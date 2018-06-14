@@ -21,19 +21,34 @@ namespace Darkworld.Components {
         fovHitTiles: Darkworld.Core.DTile[];
         fovTiles: Darkworld.Core.DTile[];
         tileLine: Phaser.Line[];
+        visibleAlpha: number;
+        dayInvisAlpha: number;
+        nightInvisAlpha: number;
+        invisAlpha: number;
+        dayRaysLengthPlus: number;
+        dayRaysLength: number;
+        nightRaysLength: number;
 
         constructor(game: Darkworld.DGame, entity: Darkworld.Entities.Entity, distance: number, angle: number, isFullView: boolean) {
             super("TiledFov");
             this.game = game;
             this.entity = entity;
             this.distance = distance;
-            this.debug = true;
+            this.debug = false;
             this.blockingLayer = this.game.dWorld.tileMap.blockingLayer;
-            this.numberOfRays = 2;
+            this.numberOfRays = 20;
             this.angle = angle ? angle : 360;
-            this.distance = distance != null ? distance : 75;
+            this.distance = distance != null ? distance : 200;
             this.isFullView = isFullView;
+            this.visibleAlpha = 0.99;
+            this.dayInvisAlpha = 0;
+            this.dayRaysLengthPlus = 50;
+            this.invisAlpha = 0;
+            this.nightInvisAlpha = 0.5;
+            this.dayRaysLength = 250;
+            this.nightRaysLength = 200;
 
+            this.dayNightSystemComponent = this.game.dWorld.getComponent("DayNightSystem") as DayNightSystem;
             this.tiledFovLayer = this.game.dWorld.tileMap.create('tiledFov', this.game.dWorld.tileMap.width, this.game.dWorld.tileMap.height, this.game.dWorld.tileMap.tileWidth, this.game.dWorld.tileMap.tileHeight);
             this.tiledFovLayer.key = "tiledFovLayer";
 
@@ -42,16 +57,19 @@ namespace Darkworld.Components {
 
             this.tileLine = [];
 
-            // create blocking layer
-            for (var i = 0; i < this.game.dWorld.tileMap.width; i++) {
-                for (var j = 0; j < this.game.dWorld.tileMap.height; j++) {
-                    var tile = this.game.dWorld.tileMap.putTile(79, i, j, this.tiledFovLayer);
-                    tile.alpha = 0.75;
-                    this.fovTiles.push(tile);
+            if (this.dayNightSystemComponent) {
+                // create blocking layer
+                for (var i = 0; i < this.game.dWorld.tileMap.width; i++) {
+                    for (var j = 0; j < this.game.dWorld.tileMap.height; j++) {
+                        var tile = this.game.dWorld.tileMap.putTile(79, i, j, this.tiledFovLayer);
+                        tile.alpha = this.visibleAlpha;
+                        tile.isVisible = true;
+                        this.fovTiles.push(tile);
+                    }
                 }
-            }
 
-            this.game.dWorld.tileMap.setCollision([79]);
+                this.game.dWorld.tileMap.setCollision([79]);
+            }
 
         }
 
@@ -59,6 +77,7 @@ namespace Darkworld.Components {
             var self = this;
             var BreakException = {};
 
+            this.fovHitTiles = [];
             for (let i = 0; i < this.numberOfRays; i++) {
                 var rotationInDegrees = (this.entity.rotation * 180 / Math.PI);
                 rotationInDegrees = rotationInDegrees - this.angle / 2;
@@ -73,9 +92,9 @@ namespace Darkworld.Components {
 
 
 
-                let tileHits = this.blockingLayer.getRayCastTiles(ray, 4, true, false);
+                let tileHits = this.blockingLayer.getRayCastTiles(ray, 4, true, false) as Darkworld.Core.DTile[];
 
-                this.fovHitTiles = [];
+
 
 
                 if (tileHits.length > 0) {
@@ -88,16 +107,25 @@ namespace Darkworld.Components {
                         linePoints.forEach(point => {
                             tileHits.forEach(tile => {
                                 if (tile.containsPoint(point[0], point[1])) {
-
+                                    debugger;
                                     if (!this.isFullView) {
                                         ray.end.setTo(point[0], point[1]);
                                     }
                                     //add own tile to add hit tile list                          
-                                    //this.fovHitTiles.push(this.game.dWorld.tileMap.getTile(tile.x, tile.y, this.tiledFovLayer) as Darkworld.Core.DTile);
+
+                                    var fovTile = this.game.dWorld.tileMap.getTile(tile.x, tile.y, this.tiledFovLayer) as Darkworld.Core.DTile;
+
+
+                                    self.fovHitTiles.push(fovTile);
+
+
+
                                     throw BreakException;
                                 }
                             });
                         });
+
+
 
 
                     } catch (e) {
@@ -112,46 +140,34 @@ namespace Darkworld.Components {
 
 
             this.rays.forEach(function (ray) {
-
-                //PROBLEM WAS HERE
-                //ITS SET THE LAST RAY INFO ALWAYS.
-                //WE NEED TO GATHER INFORMATION ABOUT TILES FIRST WITH ALL THE RAY HIT INFORMATION
-                //AFTER THAT SET ALPHA VALUES.
-
-                if (self.rays.indexOf(ray) == 0) {
-
-
-
-
-                    //check hit tiles with the the updated ray length
-                    var hitTiles = self.tiledFovLayer.getRayCastTiles(ray) as Darkworld.Core.DTile[];
-                    //adding hit tiles to hit list
-                    hitTiles.forEach(function (fovHitTile) {
+                //check hit tiles with the the updated ray length
+                var hitTiles = self.tiledFovLayer.getRayCastTiles(ray) as Darkworld.Core.DTile[];
+                //adding hit tiles to hit list
+                hitTiles.forEach(function (fovHitTile) {
+                    if (self.fovHitTiles.indexOf(fovHitTile) == -1) {
                         self.fovHitTiles.push(fovHitTile);
-                    });
+                    }
+                });
+            });
 
+            //arrange visibility
+            self.fovTiles.forEach(fovTile => {
 
-
-
-                    // iterating each hit tile
-                    self.fovHitTiles.forEach(fovHitTile => {
-                        fovHitTile.alpha = 0;
-                    });
-
-                    var fovTilesFiltered = self.fovTiles.filter(function (tile) {
-                        return tile.alpha == 0;
-                    });
-
-
-
-                    fovTilesFiltered.forEach(function (notShownFovTile) {
-
-                        let rayCastTiles = self.tiledFovLayer.getRayCastTiles(ray) as Darkworld.Core.DTile[];
-
-                        if (rayCastTiles.indexOf(notShownFovTile) == -1) {
-                            notShownFovTile.alpha = 0.75;
-                        }
-                    });
+                //check every fov tile and set visibility if hit tile 
+                if (self.fovHitTiles.indexOf(fovTile) == -1) {
+                    if (!fovTile.isVisible) {
+                        var tween = self.game.add.tween(fovTile).to({ alpha: self.visibleAlpha }, 500, "Linear", true);
+                        tween.onComplete.add(function () {
+                            fovTile.isVisible = true;
+                        });
+                    }
+                } else {
+                    if (fovTile.isVisible) {
+                        var tween = self.game.add.tween(fovTile).to({ alpha: self.invisAlpha }, 500, "Linear", true);
+                        tween.onComplete.add(function () {
+                            fovTile.isVisible = false;
+                        });
+                    }
                 }
             });
         }
@@ -159,12 +175,23 @@ namespace Darkworld.Components {
         update() {
 
             super.update();
+            if (this.dayNightSystemComponent) {
 
-            this.rays = [];
+                if (this.dayNightSystemComponent.isDay) {
+                    this.invisAlpha = this.dayInvisAlpha;
+                    this.distance = this.dayRaysLength;
+                }
+                else {
+                    this.invisAlpha = this.nightInvisAlpha;
+                    this.distance = this.nightRaysLength;
+                }
 
-            this.rayCast();
+                this.rays = [];
 
-            this.tiledFovLayer.dirty = true;
+                this.rayCast();
+
+                this.tiledFovLayer.dirty = true;
+            }
         }
 
         debugRender() {
