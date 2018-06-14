@@ -9,11 +9,13 @@ namespace Darkworld.States {
         }
 
         create() {
+            this.game.stage.disableVisibilityChange = true;
             this.game.physics.startSystem(Phaser.Physics.P2JS);
 
             this.preloadBar = this.add.sprite(300, 400, 'preloaderBar');
             this.load.setPreloadSprite(this.preloadBar);
 
+            
             this.game.dWorld = new Darkworld.Core.DWorld(this.game);
             this.game.dWorld.addComponent(new Darkworld.Components.DayNightSystem(this.game));
 
@@ -23,7 +25,7 @@ namespace Darkworld.States {
                 dayNightCycleComponent.startCycle();
             } 
   
-            this.player = this.game.dWorld.addPlayer(true);
+            this.player = this.game.dWorld.addPlayer(false,96,96);
 
             let torch = new Darkworld.Entities.Items.Torch(this.game, this.player.x+50, this.player.y+50);
 

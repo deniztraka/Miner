@@ -1,5 +1,5 @@
 namespace Darkworld.Data {
-    export class CellularAutomata {
+    export class CellularAutomata implements Darkworld.Data.IMapDataGenerator {
         width: number;
         height: number;
         cellmap: number[][];
@@ -17,6 +17,7 @@ namespace Darkworld.Data {
             this.chanceToStartAlive = chanceToStartAlive ? chanceToStartAlive : 0.45;
             this.deathLimit = deathLimit;
             this.birthLimit = birthLimit;
+            this.numberOfSteps =  2;           
 
             //map constructor
             for (var i: number = 0; i < width; i++) {
@@ -30,9 +31,9 @@ namespace Darkworld.Data {
             this.initialiseMap();
         }
 
-        generateMap(numberOfSteps: number, fillSides: boolean): number[][] {
+        generateMap( fillSides: boolean): number[][] {
             //And now run the simulation for a set number of steps
-            for (let i = 0; i < numberOfSteps; i++) {
+            for (let i = 0; i < this.numberOfSteps; i++) {
                 this.cellmap = this.doSimulationStep();
             }
 

@@ -79,7 +79,7 @@ namespace Darkworld.Components {
         }
 
         changeToDay(){            
-            console.log("change to day");
+            //console.log("change to day");
             let duration = this.dayLengthInSeconds*4/24*1000;            
             this.changing = true;
             let tween = this.game.add.tween(this).to({currentShadowAlphaValue:0},duration,Phaser.Easing.Linear.None);
@@ -88,7 +88,7 @@ namespace Darkworld.Components {
         }
 
         changeToNight(){            
-            console.log("change to night");
+            //console.log("change to night");
             let duration = this.dayLengthInSeconds*4/24*1000;            
             this.changing = true;
             let tween = this.game.add.tween(this).to({currentShadowAlphaValue:1},duration,Phaser.Easing.Linear.None);

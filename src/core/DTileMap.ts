@@ -21,8 +21,11 @@ namespace Darkworld.Core {
 
             //fill map random
             //let randomTileMapData = new Darkworld.Data.RandomTileMapData(this.game, 4, 13, 50, 38);
-            let cellularAutomataGenerator = new Darkworld.Data.CellularAutomata(this.game, this.width, this.height, 0.4, 3, 4);
-            let randomTileMapData = cellularAutomataGenerator.generateMap(2, true);
+            //let cellularAutomataGenerator = new Darkworld.Data.CellularAutomata(this.game, this.width, this.height, 0.4, 3, 4);
+            //let randomTileMapData = cellularAutomataGenerator.generateMap(true);
+
+            let customMapDataGenerator = new Darkworld.Data.TestCustomMap();
+            let randomTileMapData = customMapDataGenerator.generateMap(true);
 
             //fill with floor first
             for (var i = 0; i < randomTileMapData.length; i++) {
@@ -53,7 +56,7 @@ namespace Darkworld.Core {
                 this.marker.y = currentTile.y * this.tileHeight;
 
                 if(this.game.input.activePointer.isDown){
-                    console.log("x:"+currentTile.x+", y:"+currentTile.y + ", show:" + currentTile.show + ", alpha:" + currentTile.alpha);
+                    console.log("x:"+currentTile.x+", y:"+currentTile.y + ", show:" + currentTile.show + ", alpha:" + currentTile.alpha + ", isTweening" + currentTile.isTweening);
                 }
             }
         }
@@ -144,7 +147,7 @@ namespace Darkworld.Core {
             //Check tile show/hide
             var self = this;
             this.layers.forEach(function(layer){
-                debugger;
+                
                 var tiles = self.getDTilesArray(layer) as Darkworld.Core.DTile[];
                 tiles.forEach(tile => {
 

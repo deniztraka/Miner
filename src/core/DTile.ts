@@ -4,6 +4,7 @@ namespace Darkworld.Core {
         lastAlphaCheckTime: number = 0;
         checked = false;
         show = true;
+        isTweening = false;
 
     }
 }
