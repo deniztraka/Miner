@@ -28,13 +28,14 @@ namespace Darkworld.Components {
         dayRaysLengthPlus: number;
         dayRaysLength: number;
         nightRaysLength: number;
+        lookAt: boolean;
 
-        constructor(game: Darkworld.DGame, entity: Darkworld.Entities.Entity, distance: number, angle: number, isFullView: boolean) {
+        constructor(game: Darkworld.DGame, entity: Darkworld.Entities.Entity, distance: number, angle: number, isFullView: boolean, lookAt?: boolean) {
             super("TiledFov");
             this.game = game;
             this.entity = entity;
             this.distance = distance;
-            this.debug = false;
+            this.debug = true;
             this.blockingLayer = this.game.dWorld.tileMap.blockingLayer;
             this.numberOfRays = 20;
             this.angle = angle ? angle : 360;
@@ -47,7 +48,7 @@ namespace Darkworld.Components {
             this.nightInvisAlpha = 0.5;
             this.dayRaysLength = 250;
             this.nightRaysLength = 200;
-
+            this.lookAt = lookAt != null ? lookAt : true;
             this.dayNightSystemComponent = this.game.dWorld.getComponent("DayNightSystem") as DayNightSystem;
             this.tiledFovLayer = this.game.dWorld.tileMap.create('tiledFov', this.game.dWorld.tileMap.width, this.game.dWorld.tileMap.height, this.game.dWorld.tileMap.tileWidth, this.game.dWorld.tileMap.tileHeight);
             this.tiledFovLayer.key = "tiledFovLayer";
@@ -79,10 +80,15 @@ namespace Darkworld.Components {
 
             this.fovHitTiles = [];
             for (let i = 0; i < this.numberOfRays; i++) {
-                var rotationInDegrees = (this.entity.rotation * 180 / Math.PI);
-                rotationInDegrees = rotationInDegrees - this.angle / 2;
+                var newRotationInDegrees;
+                if (this.lookAt) {
+                    var rotationInDegrees = (this.entity.rotation * 180 / Math.PI);
+                    rotationInDegrees = rotationInDegrees - this.angle / 2;
 
-                var newRotationInDegrees = rotationInDegrees + i * this.angle / this.numberOfRays;
+                    newRotationInDegrees = rotationInDegrees + i * this.angle / this.numberOfRays;
+                }else{
+                    newRotationInDegrees = i * this.angle / this.numberOfRays;
+                }
 
                 let ray = new Phaser.Line(
                     this.entity.position.x,
