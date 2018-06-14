@@ -112368,6 +112368,294 @@ var Darkworld;
     Darkworld.DGame = DGame;
 })(Darkworld || (Darkworld = {}));
 
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var Core;
+    (function (Core) {
+        var DGameObjectFactory = (function (_super) {
+            __extends(DGameObjectFactory, _super);
+            function DGameObjectFactory() {
+                _super.apply(this, arguments);
+            }
+            DGameObjectFactory.prototype.tilemap = function (key, tileWidth, tileHeight, width, height) {
+                return new Darkworld.Core.DTileMap(this.game, key, tileWidth, tileHeight, width, height);
+            };
+            ;
+            return DGameObjectFactory;
+        }(Phaser.GameObjectFactory));
+        Core.DGameObjectFactory = DGameObjectFactory;
+    })(Core = Darkworld.Core || (Darkworld.Core = {}));
+})(Darkworld || (Darkworld = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var Core;
+    (function (Core) {
+        var DTile = (function (_super) {
+            __extends(DTile, _super);
+            function DTile() {
+                _super.apply(this, arguments);
+                this.lastAlphaCheckTime = 0;
+                this.checked = false;
+                this.show = true;
+                this.isTweening = false;
+            }
+            return DTile;
+        }(Phaser.Tile));
+        Core.DTile = DTile;
+    })(Core = Darkworld.Core || (Darkworld.Core = {}));
+})(Darkworld || (Darkworld = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var Core;
+    (function (Core) {
+        var DTileMap = (function (_super) {
+            __extends(DTileMap, _super);
+            function DTileMap(game, key, tileWidth, tileHeight, width, height) {
+                _super.call(this, game, key, tileWidth, tileHeight, width, height);
+                this.game = game;
+                //this.map.addTilesetImage("tile_floor_forest");
+                //this.addTilesetImage("tile_floor_dungeon");
+                //this.addTilesetImage("tile_floor_dungeon_32x32");
+                this.addTilesetImage("tile_floor_dungeon_64x64_fov");
+                //this.game.worldMap.addTilesetImage("tile_10");
+                this.floorLayer = this.create('floor', this.width, this.height, this.tileWidth, this.tileHeight);
+                this.blockingLayer = this.create('blocking', this.width, this.height, this.tileWidth, this.tileHeight);
+                this.blockingLayer.key = "blockingLayer";
+                this.floorLayer.resizeWorld();
+                //fill map random
+                //let randomTileMapData = new Darkworld.Data.RandomTileMapData(this.game, 4, 13, 50, 38);
+                //let cellularAutomataGenerator = new Darkworld.Data.CellularAutomata(this.game, this.width, this.height, 0.4, 3, 4);
+                //let randomTileMapData = cellularAutomataGenerator.generateMap(true);
+                var customMapDataGenerator = new Darkworld.Data.TestCustomMap();
+                var randomTileMapData = customMapDataGenerator.generateMap(true);
+                //fill with floor first
+                for (var i = 0; i < randomTileMapData.length; i++) {
+                    for (var j = 0; j < randomTileMapData[i].length; j++) {
+                        this.putTile(this.game.rnd.integerInRange(Darkworld.Utils.TileSetIndex.Dungeon.FloorStart, Darkworld.Utils.TileSetIndex.Dungeon.FloorEnd), i, j); //.alpha = 0;;
+                    }
+                }
+                // create blocking layer
+                for (var i = 0; i < randomTileMapData.length; i++) {
+                    for (var j = 0; j < randomTileMapData[i].length; j++) {
+                        if (randomTileMapData[i][j] == 1) {
+                            var tile = this.putTile(Darkworld.Utils.TileSetIndex.Dungeon.WallStart, i, j, this.blockingLayer);
+                        }
+                    }
+                }
+                this.enableTileMarker();
+                this.setCollision([Darkworld.Utils.TileSetIndex.Dungeon.WallStart]);
+                this.game.physics.p2.convertTilemap(this, this.blockingLayer);
+            }
+            /* Private Methods */
+            DTileMap.prototype.updateMarker = function () {
+                var currentTile = this.getTileWorldXY(this.game.input.activePointer.worldX, this.game.input.activePointer.worldY, this.tileWidth, this.tileHeight);
+                if (currentTile != null) {
+                    this.marker.x = currentTile.x * this.tileWidth;
+                    this.marker.y = currentTile.y * this.tileHeight;
+                    if (this.game.input.activePointer.isDown) {
+                        console.log("x:" + currentTile.x + ", y:" + currentTile.y + ", show:" + currentTile.show + ", alpha:" + currentTile.alpha + ", isTweening" + currentTile.isTweening);
+                    }
+                }
+            };
+            /* Public Methods */
+            DTileMap.prototype.enableTileMarker = function () {
+                this.marker = new Core.DTileMarker(this.game);
+                this.game.input.addMoveCallback(this.updateMarker, this);
+            };
+            DTileMap.prototype.putTile = function (tile, x, y, layer) {
+                if (tile === null) {
+                    return this.removeTile(x, y, layer);
+                }
+                layer = this.getLayer(layer);
+                if (x >= 0 && x < this.layers[layer].width && y >= 0 && y < this.layers[layer].height) {
+                    var index;
+                    if (tile instanceof Darkworld.Core.DTile) {
+                        index = tile.index;
+                        if (this.hasTile(x, y, layer)) {
+                            this.layers[layer].data[y][x].copy(tile);
+                        }
+                        else {
+                            this.layers[layer].data[y][x] = new Darkworld.Core.DTile(layer, index, x, y, tile.width, tile.height);
+                        }
+                    }
+                    else {
+                        index = tile;
+                        if (this.hasTile(x, y, layer)) {
+                            this.layers[layer].data[y][x].index = index;
+                        }
+                        else {
+                            this.layers[layer].data[y][x] = new Darkworld.Core.DTile(this.layers[layer], index, x, y, this.tileWidth, this.tileHeight);
+                        }
+                    }
+                    if (this.collideIndexes.indexOf(index) > -1) {
+                        this.layers[layer].data[y][x].setCollision(true, true, true, true);
+                    }
+                    else {
+                        this.layers[layer].data[y][x].resetCollision();
+                    }
+                    this.layers[layer].dirty = true;
+                    this.calculateFaces(layer);
+                    return this.layers[layer].data[y][x];
+                }
+                return null;
+            };
+            DTileMap.prototype.getOpenCellPoint = function () {
+                var openCellPoint;
+                var openCellFound = false;
+                while (!openCellFound) {
+                    var randomX = this.game.rnd.integerInRange(0, this.width - 1);
+                    var randomY = this.game.rnd.integerInRange(0, this.height - 1);
+                    var randomTile = this.getTile(randomX, randomY);
+                    if (randomTile.index == 0) {
+                        openCellFound = true; //we found an open cell
+                        openCellPoint = new Phaser.Point(randomTile.worldX + randomTile.width / 2, randomTile.worldY + randomTile.height / 2);
+                    }
+                }
+                return openCellPoint;
+            };
+            DTileMap.prototype.getDTilesArray = function (layer) {
+                var tiles = [];
+                for (var i = 0; i < this.width; i++) {
+                    for (var j = 0; j < this.height; j++) {
+                        tiles.push(this.getTile(i, j, layer.name));
+                    }
+                }
+                return tiles;
+            };
+            DTileMap.prototype.update = function () {
+                //Check tile show/hide
+                var self = this;
+                // this.layers.forEach(function(layer){
+                //     var tiles = self.getDTilesArray(layer) as Darkworld.Core.DTile[];
+                //     tiles.forEach(tile => {
+                //         if(tile.show && tile.alpha == 0){
+                //             //console.log("showing");
+                //             self.game.add.tween(tile).to({ alpha: 1 }, 250, "Linear", true);
+                //         }else if(!tile.show && tile.alpha == 1){
+                //             //console.log("hiding");
+                //             self.game.add.tween(tile).to({ alpha: 0 }, 250, "Linear", true);
+                //         }
+                //     });
+                //     layer.dirty = true;
+                // });
+            };
+            return DTileMap;
+        }(Phaser.Tilemap));
+        Core.DTileMap = DTileMap;
+    })(Core = Darkworld.Core || (Darkworld.Core = {}));
+})(Darkworld || (Darkworld = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var Core;
+    (function (Core) {
+        var DTileMarker = (function (_super) {
+            __extends(DTileMarker, _super);
+            function DTileMarker(game, x, y) {
+                _super.call(this, game, x, y);
+                this.lineStyle(2, 0x000000, 1);
+                this.drawRect(0, 0, 64, 64);
+                game.add.existing(this);
+            }
+            DTileMarker.prototype.update = function () {
+            };
+            return DTileMarker;
+        }(Phaser.Graphics));
+        Core.DTileMarker = DTileMarker;
+    })(Core = Darkworld.Core || (Darkworld.Core = {}));
+})(Darkworld || (Darkworld = {}));
+
+var Darkworld;
+(function (Darkworld) {
+    var Core;
+    (function (Core) {
+        var DWorld = (function () {
+            function DWorld(game) {
+                this.mapHeight = 10; //38
+                this.mapWidth = 5; //60
+                this.tileResolution = 64;
+                this.customComponents = [];
+                this.game = game;
+                this.tileMap = new Core.DTileMap(this.game, null, this.tileResolution, this.tileResolution, this.mapWidth, this.mapHeight);
+            }
+            DWorld.prototype.addPlayer = function (isRandom, x, y) {
+                var playerSpawnPoint;
+                if (isRandom) {
+                    playerSpawnPoint = this.tileMap.getOpenCellPoint();
+                }
+                else if (x != null && y != null) {
+                    playerSpawnPoint = new Phaser.Point(x, y);
+                }
+                else {
+                    playerSpawnPoint = this.tileMap.getOpenCellPoint();
+                }
+                return this.player = new Darkworld.Entities.Mobiles.Humanoids.Player(this.game, playerSpawnPoint.x, playerSpawnPoint.y);
+            };
+            DWorld.prototype.addComponent = function (component) {
+                if (this.customComponents == null) {
+                    this.customComponents = [];
+                }
+                this.customComponents.push(component);
+            };
+            DWorld.prototype.addComponents = function (components) {
+                var _this = this;
+                components.forEach(function (component) {
+                    _this.addComponent(component);
+                });
+            };
+            DWorld.prototype.getComponent = function (givenComponentName) {
+                var foundComponent;
+                this.customComponents.forEach(function (component) {
+                    if (component.name === givenComponentName) {
+                        foundComponent = component;
+                    }
+                });
+                return foundComponent;
+            };
+            DWorld.prototype.update = function () {
+                this.customComponents.forEach(function (component) {
+                    if (component.isEnabled) {
+                        component.update();
+                    }
+                });
+                this.tileMap.update();
+                this.debugRender();
+            };
+            DWorld.prototype.debugRender = function () {
+                this.customComponents.forEach(function (component) {
+                    if (component.isEnabled) {
+                        component.debugRender();
+                    }
+                });
+            };
+            return DWorld;
+        }());
+        Core.DWorld = DWorld;
+    })(Core = Darkworld.Core || (Darkworld.Core = {}));
+})(Darkworld || (Darkworld = {}));
+
 var Darkworld;
 (function (Darkworld) {
     var Components;
@@ -112840,34 +113128,36 @@ var Darkworld;
                 this.distance = distance;
                 this.debug = true;
                 this.blockingLayer = this.game.dWorld.tileMap.blockingLayer;
-                this.numberOfRays = 1;
+                this.numberOfRays = 2;
                 this.angle = angle ? angle : 360;
                 this.distance = distance != null ? distance : 75;
                 this.isFullView = isFullView;
                 this.tiledFovLayer = this.game.dWorld.tileMap.create('tiledFov', this.game.dWorld.tileMap.width, this.game.dWorld.tileMap.height, this.game.dWorld.tileMap.tileWidth, this.game.dWorld.tileMap.tileHeight);
                 this.tiledFovLayer.key = "tiledFovLayer";
-                this.fovTileHits = [];
-                this.fovTileTrash = [];
+                this.fovHitTiles = [];
+                this.fovTiles = [];
                 this.tileLine = [];
-                // // create blocking layer
+                // create blocking layer
                 for (var i = 0; i < this.game.dWorld.tileMap.width; i++) {
                     for (var j = 0; j < this.game.dWorld.tileMap.height; j++) {
                         var tile = this.game.dWorld.tileMap.putTile(79, i, j, this.tiledFovLayer);
+                        tile.alpha = 0.75;
+                        this.fovTiles.push(tile);
                     }
                 }
                 this.game.dWorld.tileMap.setCollision([79]);
             }
             TiledFov.prototype.rayCast = function () {
                 var _this = this;
+                var self = this;
                 var BreakException = {};
                 var _loop_1 = function(i) {
                     rotationInDegrees = (this_1.entity.rotation * 180 / Math.PI);
                     rotationInDegrees = rotationInDegrees - this_1.angle / 2;
                     newRotationInDegrees = rotationInDegrees + i * this_1.angle / this_1.numberOfRays;
                     var ray = new Phaser.Line(this_1.entity.position.x, this_1.entity.position.y, this_1.entity.position.x + this_1.distance * Math.cos(newRotationInDegrees * (Math.PI / 180)), this_1.entity.position.y + this_1.distance * Math.sin(newRotationInDegrees * (Math.PI / 180)));
-                    this_1.rays.push(ray);
                     var tileHits = this_1.blockingLayer.getRayCastTiles(ray, 4, true, false);
-                    this_1.fovTileHits = [];
+                    this_1.fovHitTiles = [];
                     if (tileHits.length > 0) {
                         try {
                             var linePoints = [];
@@ -112879,10 +113169,9 @@ var Darkworld;
                                         if (!_this.isFullView) {
                                             ray.end.setTo(point[0], point[1]);
                                         }
-                                        _this.fovTileHits.push(_this.game.dWorld.tileMap.getTile(tile.x, tile.y, _this.tiledFovLayer));
+                                        //add own tile to add hit tile list                          
+                                        //this.fovHitTiles.push(this.game.dWorld.tileMap.getTile(tile.x, tile.y, this.tiledFovLayer) as Darkworld.Core.DTile);
                                         throw BreakException;
-                                    }
-                                    else {
                                     }
                                 });
                             });
@@ -112892,108 +113181,46 @@ var Darkworld;
                                 throw e;
                         }
                     }
-                    //get ray cast tiles
-                    tilesFromRay = this_1.tiledFovLayer.getRayCastTiles(ray, 4, true, false);
-                    tilesFromRay.forEach(function (fovTile) {
-                        if (fovTile.alpha != 0) {
-                            _this.fovTileHits.push(fovTile);
-                        }
-                    });
-                    this_1.fovTileHits.forEach(function (fovTile) {
-                        if (fovTile.alpha != 0 && fovTile.show && !fovTile.isTweening) {
-                            if (fovTile.x == 3 && fovTile.y == 1) {
-                                fovTile.show = false;
-                                console.log("hide from raycast");
-                            }
-                        }
-                    });
+                    this_1.rays.push(ray);
                 };
                 var this_1 = this;
-                var rotationInDegrees, newRotationInDegrees, tilesFromRay;
+                var rotationInDegrees, newRotationInDegrees;
                 for (var i = 0; i < this.numberOfRays; i++) {
                     _loop_1(i);
                 }
+                this.rays.forEach(function (ray) {
+                    //PROBLEM WAS HERE
+                    //ITS SET THE LAST RAY INFO ALWAYS.
+                    //WE NEED TO GATHER INFORMATION ABOUT TILES FIRST WITH ALL THE RAY HIT INFORMATION
+                    //AFTER THAT SET ALPHA VALUES.
+                    if (self.rays.indexOf(ray) == 0) {
+                        //check hit tiles with the the updated ray length
+                        var hitTiles = self.tiledFovLayer.getRayCastTiles(ray);
+                        //adding hit tiles to hit list
+                        hitTiles.forEach(function (fovHitTile) {
+                            self.fovHitTiles.push(fovHitTile);
+                        });
+                        // iterating each hit tile
+                        self.fovHitTiles.forEach(function (fovHitTile) {
+                            fovHitTile.alpha = 0;
+                        });
+                        var fovTilesFiltered = self.fovTiles.filter(function (tile) {
+                            return tile.alpha == 0;
+                        });
+                        fovTilesFiltered.forEach(function (notShownFovTile) {
+                            var rayCastTiles = self.tiledFovLayer.getRayCastTiles(ray);
+                            if (rayCastTiles.indexOf(notShownFovTile) == -1) {
+                                notShownFovTile.alpha = 0.75;
+                            }
+                        });
+                    }
+                });
             };
             TiledFov.prototype.update = function () {
                 _super.prototype.update.call(this);
                 this.rays = [];
                 this.rayCast();
-                //this.checkShow();
-                //this.clearAlpha();
-            };
-            TiledFov.prototype.checkShow = function () {
-                var self = this;
-                var tiles = self.game.dWorld.tileMap.getDTilesArray(self.tiledFovLayer);
-                tiles.forEach(function (tile) {
-                    if (tile.show && tile.alpha == 0 && !tile.isTweening) {
-                        //console.log("showing");
-                        tile.isTweening = true;
-                        var tileTween = self.game.add.tween(tile).to({ alpha: 1 }, 250, "Linear", true);
-                        tileTween.onComplete.add(function () {
-                            tile.isTweening = false;
-                        });
-                    }
-                    else if (!tile.show && tile.alpha == 1 && !tile.isTweening) {
-                        //console.log("hiding" + "x:" + tile.x + ", y:" + tile.y);
-                        tile.isTweening = true;
-                        var tileTween = self.game.add.tween(tile).to({ alpha: 0 }, 250, "Linear", true);
-                        tileTween.onComplete.add(function () {
-                            tile.isTweening = false;
-                        });
-                    }
-                });
-                self.tiledFovLayer.dirty = true;
-            };
-            TiledFov.prototype.clearAlpha = function () {
-                var self = this;
-                var hiddenTiles = this.game.dWorld.tileMap.getDTilesArray(this.tiledFovLayer).filter(function (tile) {
-                    return !tile.show;
-                });
-                hiddenTiles.forEach(function (tile) {
-                    //tile.show = true;
-                    //console.log("x:" + tile.x + ", y:" + tile.y + ", show:" + tile.show + ", alpha:" + tile.alpha);
-                    self.tileLine.push(new Phaser.Line(tile.worldX, tile.worldY, tile.worldX + tile.width, tile.worldY), new Phaser.Line(tile.worldX + tile.width, tile.worldY, tile.worldX + tile.width, tile.worldY + tile.height), new Phaser.Line(tile.worldX + tile.width, tile.worldY + tile.height, tile.worldX, tile.worldY + tile.height), new Phaser.Line(tile.worldX, tile.worldY + tile.height, tile.worldX, tile.worldY));
-                    //console.log("show from clearalpha");
-                    // if (tile.x == 3 && tile.y == 1) {
-                    //     console.log(totalSince);
-                    // }
-                    var totalSince = self.game.time.totalElapsedSeconds() - tile.lastAlphaCheckTime;
-                    if (totalSince >= 1) {
-                        var intersects_1 = false;
-                        self.rays.forEach(function (ray) {
-                            var lines = self.tileLine;
-                            for (var i = 0; i < lines.length; i++) {
-                                var intersect = Phaser.Line.intersects(ray, lines[i]);
-                                if (intersect) {
-                                    //console.log("intersects")
-                                    intersects_1 = true;
-                                }
-                                else {
-                                }
-                            }
-                        });
-                        if (intersects_1) {
-                            tile.show = true;
-                        }
-                        else {
-                        }
-                        tile.lastAlphaCheckTime = self.game.time.totalElapsedSeconds();
-                    }
-                    //console.log("x:"+tile.x+", y:"+tile.y + ", show:" + tile.show + ", alpha:" + tile.alpha); 
-                    // self.rays.forEach(function (ray) {
-                    //     var rayCastedTiles = self.tiledFovLayer.getRayCastTiles(ray) as Darkworld.Core.DTile[];
-                    //     rayCastedTiles.forEach(function (tileHit) {
-                    //         if((tileHit.x == tile.x && tileHit.y == tile.y)){
-                    //             console.log("x:"+tile.x+", y:"+tile.y + ", show:" + tile.show + ", alpha:" + tile.alpha); 
-                    //         }
-                    //         // if (!(tileHit.y == tile.y && tileHit.x == tileHit.x) && !tileHit.isTweening && tileHit.x == 3 && tileHit.y == 1) {
-                    //         //     //console.log("x:"+tileHit.x+", y:"+tileHit.y + ", show:" + tileHit.show + ", alpha:" + tileHit.alpha); 
-                    //         //     tile.show = true;
-                    //         //     console.log("show from clearalpha");
-                    //         // }
-                    //     });
-                    // });
-                });
+                this.tiledFovLayer.dirty = true;
             };
             TiledFov.prototype.debugRender = function () {
                 var self = this;
@@ -113006,15 +113233,38 @@ var Darkworld;
                 this.rays.forEach(function (ray) {
                     self.game.debug.geom(ray);
                 });
-                this.tileLine.forEach(function (line) {
-                    self.game.debug.geom(line);
-                });
                 this.tileLine = [];
             };
             return TiledFov;
         }(Components.BaseComponent));
         Components.TiledFov = TiledFov;
     })(Components = Darkworld.Components || (Darkworld.Components = {}));
+})(Darkworld || (Darkworld = {}));
+
+var Darkworld;
+(function (Darkworld) {
+    var Engines;
+    (function (Engines) {
+        var InputHandler = (function () {
+            function InputHandler(game) {
+                this.game = game;
+                this.isEnabled = true;
+                this.actionButton = this.game.input.activePointer.leftButton;
+                this.selectButton = this.game.input.activePointer.rightButton;
+                this.keyboard = this.game.input.keyboard;
+            }
+            InputHandler.prototype.update = function () {
+                if (this.isEnabled) {
+                }
+            };
+            InputHandler.prototype.getAngleFrom = function (entity) {
+                return this.game.physics.arcade.angleToPointer(entity);
+                //return Math.atan2(this.game.input.activePointer.y - entity.worldPosition.y, this.game.input.activePointer.x - entity.worldPosition.x ) * (180/Math.PI);
+            };
+            return InputHandler;
+        }());
+        Engines.InputHandler = InputHandler;
+    })(Engines = Darkworld.Engines || (Darkworld.Engines = {}));
 })(Darkworld || (Darkworld = {}));
 
 var Darkworld;
@@ -113231,369 +113481,6 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Darkworld;
 (function (Darkworld) {
-    var Core;
-    (function (Core) {
-        var DGameObjectFactory = (function (_super) {
-            __extends(DGameObjectFactory, _super);
-            function DGameObjectFactory() {
-                _super.apply(this, arguments);
-            }
-            DGameObjectFactory.prototype.tilemap = function (key, tileWidth, tileHeight, width, height) {
-                return new Darkworld.Core.DTileMap(this.game, key, tileWidth, tileHeight, width, height);
-            };
-            ;
-            return DGameObjectFactory;
-        }(Phaser.GameObjectFactory));
-        Core.DGameObjectFactory = DGameObjectFactory;
-    })(Core = Darkworld.Core || (Darkworld.Core = {}));
-})(Darkworld || (Darkworld = {}));
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Darkworld;
-(function (Darkworld) {
-    var Core;
-    (function (Core) {
-        var DTile = (function (_super) {
-            __extends(DTile, _super);
-            function DTile() {
-                _super.apply(this, arguments);
-                this.lastAlphaCheckTime = 0;
-                this.checked = false;
-                this.show = true;
-                this.isTweening = false;
-            }
-            return DTile;
-        }(Phaser.Tile));
-        Core.DTile = DTile;
-    })(Core = Darkworld.Core || (Darkworld.Core = {}));
-})(Darkworld || (Darkworld = {}));
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Darkworld;
-(function (Darkworld) {
-    var Core;
-    (function (Core) {
-        var DTileMap = (function (_super) {
-            __extends(DTileMap, _super);
-            function DTileMap(game, key, tileWidth, tileHeight, width, height) {
-                _super.call(this, game, key, tileWidth, tileHeight, width, height);
-                this.game = game;
-                //this.map.addTilesetImage("tile_floor_forest");
-                //this.addTilesetImage("tile_floor_dungeon");
-                //this.addTilesetImage("tile_floor_dungeon_32x32");
-                this.addTilesetImage("tile_floor_dungeon_64x64_fov");
-                //this.game.worldMap.addTilesetImage("tile_10");
-                this.floorLayer = this.create('floor', this.width, this.height, this.tileWidth, this.tileHeight);
-                this.blockingLayer = this.create('blocking', this.width, this.height, this.tileWidth, this.tileHeight);
-                this.blockingLayer.key = "blockingLayer";
-                this.floorLayer.resizeWorld();
-                //fill map random
-                //let randomTileMapData = new Darkworld.Data.RandomTileMapData(this.game, 4, 13, 50, 38);
-                //let cellularAutomataGenerator = new Darkworld.Data.CellularAutomata(this.game, this.width, this.height, 0.4, 3, 4);
-                //let randomTileMapData = cellularAutomataGenerator.generateMap(true);
-                var customMapDataGenerator = new Darkworld.Data.TestCustomMap();
-                var randomTileMapData = customMapDataGenerator.generateMap(true);
-                //fill with floor first
-                for (var i = 0; i < randomTileMapData.length; i++) {
-                    for (var j = 0; j < randomTileMapData[i].length; j++) {
-                        this.putTile(this.game.rnd.integerInRange(Darkworld.Utils.TileSetIndex.Dungeon.FloorStart, Darkworld.Utils.TileSetIndex.Dungeon.FloorEnd), i, j); //.alpha = 0;;
-                    }
-                }
-                // create blocking layer
-                for (var i = 0; i < randomTileMapData.length; i++) {
-                    for (var j = 0; j < randomTileMapData[i].length; j++) {
-                        if (randomTileMapData[i][j] == 1) {
-                            var tile = this.putTile(Darkworld.Utils.TileSetIndex.Dungeon.WallStart, i, j, this.blockingLayer);
-                        }
-                    }
-                }
-                this.enableTileMarker();
-                this.setCollision([Darkworld.Utils.TileSetIndex.Dungeon.WallStart]);
-                this.game.physics.p2.convertTilemap(this, this.blockingLayer);
-            }
-            /* Private Methods */
-            DTileMap.prototype.updateMarker = function () {
-                var currentTile = this.getTileWorldXY(this.game.input.activePointer.worldX, this.game.input.activePointer.worldY, this.tileWidth, this.tileHeight);
-                if (currentTile != null) {
-                    this.marker.x = currentTile.x * this.tileWidth;
-                    this.marker.y = currentTile.y * this.tileHeight;
-                    if (this.game.input.activePointer.isDown) {
-                        console.log("x:" + currentTile.x + ", y:" + currentTile.y + ", show:" + currentTile.show + ", alpha:" + currentTile.alpha + ", isTweening" + currentTile.isTweening);
-                    }
-                }
-            };
-            /* Public Methods */
-            DTileMap.prototype.enableTileMarker = function () {
-                this.marker = new Core.DTileMarker(this.game);
-                this.game.input.addMoveCallback(this.updateMarker, this);
-            };
-            DTileMap.prototype.putTile = function (tile, x, y, layer) {
-                if (tile === null) {
-                    return this.removeTile(x, y, layer);
-                }
-                layer = this.getLayer(layer);
-                if (x >= 0 && x < this.layers[layer].width && y >= 0 && y < this.layers[layer].height) {
-                    var index;
-                    if (tile instanceof Darkworld.Core.DTile) {
-                        index = tile.index;
-                        if (this.hasTile(x, y, layer)) {
-                            this.layers[layer].data[y][x].copy(tile);
-                        }
-                        else {
-                            this.layers[layer].data[y][x] = new Darkworld.Core.DTile(layer, index, x, y, tile.width, tile.height);
-                        }
-                    }
-                    else {
-                        index = tile;
-                        if (this.hasTile(x, y, layer)) {
-                            this.layers[layer].data[y][x].index = index;
-                        }
-                        else {
-                            this.layers[layer].data[y][x] = new Darkworld.Core.DTile(this.layers[layer], index, x, y, this.tileWidth, this.tileHeight);
-                        }
-                    }
-                    if (this.collideIndexes.indexOf(index) > -1) {
-                        this.layers[layer].data[y][x].setCollision(true, true, true, true);
-                    }
-                    else {
-                        this.layers[layer].data[y][x].resetCollision();
-                    }
-                    this.layers[layer].dirty = true;
-                    this.calculateFaces(layer);
-                    return this.layers[layer].data[y][x];
-                }
-                return null;
-            };
-            DTileMap.prototype.getOpenCellPoint = function () {
-                var openCellPoint;
-                var openCellFound = false;
-                while (!openCellFound) {
-                    var randomX = this.game.rnd.integerInRange(0, this.width - 1);
-                    var randomY = this.game.rnd.integerInRange(0, this.height - 1);
-                    var randomTile = this.getTile(randomX, randomY);
-                    if (randomTile.index == 0) {
-                        openCellFound = true; //we found an open cell
-                        openCellPoint = new Phaser.Point(randomTile.worldX + randomTile.width / 2, randomTile.worldY + randomTile.height / 2);
-                    }
-                }
-                return openCellPoint;
-            };
-            DTileMap.prototype.getDTilesArray = function (layer) {
-                var tiles = [];
-                for (var i = 0; i < this.width; i++) {
-                    for (var j = 0; j < this.height; j++) {
-                        tiles.push(this.getTile(i, j, layer.name));
-                    }
-                }
-                return tiles;
-            };
-            DTileMap.prototype.update = function () {
-                //Check tile show/hide
-                var self = this;
-                this.layers.forEach(function (layer) {
-                    var tiles = self.getDTilesArray(layer);
-                    tiles.forEach(function (tile) {
-                        if (tile.show && tile.alpha == 0) {
-                            //console.log("showing");
-                            self.game.add.tween(tile).to({ alpha: 1 }, 250, "Linear", true);
-                        }
-                        else if (!tile.show && tile.alpha == 1) {
-                            //console.log("hiding");
-                            self.game.add.tween(tile).to({ alpha: 0 }, 250, "Linear", true);
-                        }
-                    });
-                    layer.dirty = true;
-                });
-            };
-            return DTileMap;
-        }(Phaser.Tilemap));
-        Core.DTileMap = DTileMap;
-    })(Core = Darkworld.Core || (Darkworld.Core = {}));
-})(Darkworld || (Darkworld = {}));
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Darkworld;
-(function (Darkworld) {
-    var Core;
-    (function (Core) {
-        var DTileMarker = (function (_super) {
-            __extends(DTileMarker, _super);
-            function DTileMarker(game, x, y) {
-                _super.call(this, game, x, y);
-                this.lineStyle(2, 0x000000, 1);
-                this.drawRect(0, 0, 64, 64);
-                game.add.existing(this);
-            }
-            DTileMarker.prototype.update = function () {
-            };
-            return DTileMarker;
-        }(Phaser.Graphics));
-        Core.DTileMarker = DTileMarker;
-    })(Core = Darkworld.Core || (Darkworld.Core = {}));
-})(Darkworld || (Darkworld = {}));
-
-var Darkworld;
-(function (Darkworld) {
-    var Core;
-    (function (Core) {
-        var DWorld = (function () {
-            function DWorld(game) {
-                this.mapHeight = 10; //38
-                this.mapWidth = 5; //60
-                this.tileResolution = 64;
-                this.customComponents = [];
-                this.game = game;
-                this.tileMap = new Core.DTileMap(this.game, null, this.tileResolution, this.tileResolution, this.mapWidth, this.mapHeight);
-            }
-            DWorld.prototype.addPlayer = function (isRandom, x, y) {
-                var playerSpawnPoint;
-                if (isRandom) {
-                    playerSpawnPoint = this.tileMap.getOpenCellPoint();
-                }
-                else if (x != null && y != null) {
-                    playerSpawnPoint = new Phaser.Point(x, y);
-                }
-                else {
-                    playerSpawnPoint = this.tileMap.getOpenCellPoint();
-                }
-                return this.player = new Darkworld.Entities.Mobiles.Humanoids.Player(this.game, playerSpawnPoint.x, playerSpawnPoint.y);
-            };
-            DWorld.prototype.addComponent = function (component) {
-                if (this.customComponents == null) {
-                    this.customComponents = [];
-                }
-                this.customComponents.push(component);
-            };
-            DWorld.prototype.addComponents = function (components) {
-                var _this = this;
-                components.forEach(function (component) {
-                    _this.addComponent(component);
-                });
-            };
-            DWorld.prototype.getComponent = function (givenComponentName) {
-                var foundComponent;
-                this.customComponents.forEach(function (component) {
-                    if (component.name === givenComponentName) {
-                        foundComponent = component;
-                    }
-                });
-                return foundComponent;
-            };
-            DWorld.prototype.update = function () {
-                this.customComponents.forEach(function (component) {
-                    if (component.isEnabled) {
-                        component.update();
-                    }
-                });
-                this.tileMap.update();
-                this.debugRender();
-            };
-            DWorld.prototype.debugRender = function () {
-                this.customComponents.forEach(function (component) {
-                    if (component.isEnabled) {
-                        component.debugRender();
-                    }
-                });
-            };
-            return DWorld;
-        }());
-        Core.DWorld = DWorld;
-    })(Core = Darkworld.Core || (Darkworld.Core = {}));
-})(Darkworld || (Darkworld = {}));
-
-var Darkworld;
-(function (Darkworld) {
-    var Engines;
-    (function (Engines) {
-        var InputHandler = (function () {
-            function InputHandler(game) {
-                this.game = game;
-                this.isEnabled = true;
-                this.actionButton = this.game.input.activePointer.leftButton;
-                this.selectButton = this.game.input.activePointer.rightButton;
-                this.keyboard = this.game.input.keyboard;
-            }
-            InputHandler.prototype.update = function () {
-                if (this.isEnabled) {
-                }
-            };
-            InputHandler.prototype.getAngleFrom = function (entity) {
-                return this.game.physics.arcade.angleToPointer(entity);
-                //return Math.atan2(this.game.input.activePointer.y - entity.worldPosition.y, this.game.input.activePointer.x - entity.worldPosition.x ) * (180/Math.PI);
-            };
-            return InputHandler;
-        }());
-        Engines.InputHandler = InputHandler;
-    })(Engines = Darkworld.Engines || (Darkworld.Engines = {}));
-})(Darkworld || (Darkworld = {}));
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Darkworld;
-(function (Darkworld) {
-    var Entities;
-    (function (Entities) {
-        var Entity = (function (_super) {
-            __extends(Entity, _super);
-            function Entity(game, x, y, key, frame) {
-                _super.call(this, game, x, y, key, frame);
-                this.anchor.setTo(0.5, 0.5);
-                this.game.add.existing(this);
-                this.customComponents = new Array();
-            }
-            Entity.prototype.addComponent = function (component) {
-                this.customComponents.push(component);
-            };
-            Entity.prototype.addComponents = function (components) {
-                var _this = this;
-                components.forEach(function (component) {
-                    _this.addComponent(component);
-                });
-            };
-            Entity.prototype.update = function () {
-                _super.prototype.update.call(this);
-                this.customComponents.forEach(function (component) {
-                    if (component.isEnabled) {
-                        component.update();
-                    }
-                });
-                this.debugRender();
-            };
-            Entity.prototype.debugRender = function () {
-                this.customComponents.forEach(function (component) {
-                    if (component.isEnabled) {
-                        component.debugRender();
-                    }
-                });
-            };
-            return Entity;
-        }(Phaser.Sprite));
-        Entities.Entity = Entity;
-    })(Entities = Darkworld.Entities || (Darkworld.Entities = {}));
-})(Darkworld || (Darkworld = {}));
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Darkworld;
-(function (Darkworld) {
     var States;
     (function (States) {
         var Boot = (function (_super) {
@@ -113746,6 +113633,54 @@ var Darkworld;
     })(States = Darkworld.States || (Darkworld.States = {}));
 })(Darkworld || (Darkworld = {}));
 
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var Entities;
+    (function (Entities) {
+        var Entity = (function (_super) {
+            __extends(Entity, _super);
+            function Entity(game, x, y, key, frame) {
+                _super.call(this, game, x, y, key, frame);
+                this.anchor.setTo(0.5, 0.5);
+                this.game.add.existing(this);
+                this.customComponents = new Array();
+            }
+            Entity.prototype.addComponent = function (component) {
+                this.customComponents.push(component);
+            };
+            Entity.prototype.addComponents = function (components) {
+                var _this = this;
+                components.forEach(function (component) {
+                    _this.addComponent(component);
+                });
+            };
+            Entity.prototype.update = function () {
+                _super.prototype.update.call(this);
+                this.customComponents.forEach(function (component) {
+                    if (component.isEnabled) {
+                        component.update();
+                    }
+                });
+                this.debugRender();
+            };
+            Entity.prototype.debugRender = function () {
+                this.customComponents.forEach(function (component) {
+                    if (component.isEnabled) {
+                        component.debugRender();
+                    }
+                });
+            };
+            return Entity;
+        }(Phaser.Sprite));
+        Entities.Entity = Entity;
+    })(Entities = Darkworld.Entities || (Darkworld.Entities = {}));
+})(Darkworld || (Darkworld = {}));
+
 var Darkworld;
 (function (Darkworld) {
     var Utils;
@@ -113761,38 +113696,6 @@ var Darkworld;
             var Dungeon = TileSetIndex.Dungeon;
         })(TileSetIndex = Utils.TileSetIndex || (Utils.TileSetIndex = {}));
     })(Utils = Darkworld.Utils || (Darkworld.Utils = {}));
-})(Darkworld || (Darkworld = {}));
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Darkworld;
-(function (Darkworld) {
-    var Entities;
-    (function (Entities) {
-        var Mobiles;
-        (function (Mobiles) {
-            var Mobile = (function (_super) {
-                __extends(Mobile, _super);
-                function Mobile(game, x, y, key, frame) {
-                    _super.call(this, game, x, y, key, frame);
-                    this.speed = 100;
-                }
-                Mobile.prototype.update = function () {
-                    _super.prototype.update.call(this);
-                };
-                ;
-                Mobile.prototype.debugRender = function () {
-                    _super.prototype.debugRender.call(this);
-                };
-                ;
-                return Mobile;
-            }(Darkworld.Entities.Entity));
-            Mobiles.Mobile = Mobile;
-        })(Mobiles = Entities.Mobiles || (Entities.Mobiles = {}));
-    })(Entities = Darkworld.Entities || (Darkworld.Entities = {}));
 })(Darkworld || (Darkworld = {}));
 
 var __extends = (this && this.__extends) || function (d, b) {
@@ -113856,6 +113759,38 @@ var Darkworld;
             }(Darkworld.Entities.Entity));
             Items.Torch = Torch;
         })(Items = Entities.Items || (Entities.Items = {}));
+    })(Entities = Darkworld.Entities || (Darkworld.Entities = {}));
+})(Darkworld || (Darkworld = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var Entities;
+    (function (Entities) {
+        var Mobiles;
+        (function (Mobiles) {
+            var Mobile = (function (_super) {
+                __extends(Mobile, _super);
+                function Mobile(game, x, y, key, frame) {
+                    _super.call(this, game, x, y, key, frame);
+                    this.speed = 100;
+                }
+                Mobile.prototype.update = function () {
+                    _super.prototype.update.call(this);
+                };
+                ;
+                Mobile.prototype.debugRender = function () {
+                    _super.prototype.debugRender.call(this);
+                };
+                ;
+                return Mobile;
+            }(Darkworld.Entities.Entity));
+            Mobiles.Mobile = Mobile;
+        })(Mobiles = Entities.Mobiles || (Entities.Mobiles = {}));
     })(Entities = Darkworld.Entities || (Darkworld.Entities = {}));
 })(Darkworld || (Darkworld = {}));
 
@@ -113941,7 +113876,7 @@ var Darkworld;
                             // new Darkworld.Components.Fov(this.game as DGame,this,-15,15,'rgba(252, 233, 106, 1.0)','rgba(255, 255, 255, 0.0)',350,false,60,true),
                             // new Darkworld.Components.Fov(this.game as DGame,this,0,0,'rgba(252, 233, 106, 1.0)','rgba(255, 255, 255, 0.0)',350,false,60,true),
                             new Darkworld.Components.Fov(this.game, this, 0, 0, 'rgba(252, 233, 106, 0.9)', 'rgba(255, 255, 255, 0.0)', 500, true),
-                            new Darkworld.Components.TiledFov(this.game, this, 200, 0.1, false)
+                            new Darkworld.Components.TiledFov(this.game, this, 200, 75, false)
                         ]);
                     };
                     return Player;

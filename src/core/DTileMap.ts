@@ -146,24 +146,24 @@ namespace Darkworld.Core {
         update() {
             //Check tile show/hide
             var self = this;
-            this.layers.forEach(function(layer){
+            // this.layers.forEach(function(layer){
                 
-                var tiles = self.getDTilesArray(layer) as Darkworld.Core.DTile[];
-                tiles.forEach(tile => {
+            //     var tiles = self.getDTilesArray(layer) as Darkworld.Core.DTile[];
+            //     tiles.forEach(tile => {
 
 
 
-                    if(tile.show && tile.alpha == 0){
-                        //console.log("showing");
-                        self.game.add.tween(tile).to({ alpha: 1 }, 250, "Linear", true);
-                    }else if(!tile.show && tile.alpha == 1){
-                        //console.log("hiding");
-                        self.game.add.tween(tile).to({ alpha: 0 }, 250, "Linear", true);
+            //         if(tile.show && tile.alpha == 0){
+            //             //console.log("showing");
+            //             self.game.add.tween(tile).to({ alpha: 1 }, 250, "Linear", true);
+            //         }else if(!tile.show && tile.alpha == 1){
+            //             //console.log("hiding");
+            //             self.game.add.tween(tile).to({ alpha: 0 }, 250, "Linear", true);
                        
-                    }
-                });
-                layer.dirty = true;
-            });
+            //         }
+            //     });
+            //     layer.dirty = true;
+            // });
                        
         }
     }
