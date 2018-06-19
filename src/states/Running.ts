@@ -27,6 +27,8 @@ namespace Darkworld.States {
   
             this.player = this.game.dWorld.addPlayer(true,96,96);
 
+            //this.game.dWorld.tileMap.putDTile(this.player);
+
             // let torch = new Darkworld.Entities.Items.Torch(this.game, this.player.x+50, this.player.y+50);
 
             // let torch1 = new Darkworld.Entities.Items.Torch(this.game,500,450);

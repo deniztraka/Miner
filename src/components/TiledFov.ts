@@ -35,9 +35,9 @@ namespace Darkworld.Components {
             this.game = game;
             this.entity = entity;
             this.distance = distance;
-            this.debug = true;
+            this.debug = false;
             this.blockingLayer = this.game.dWorld.tileMap.blockingLayer;
-            this.numberOfRays = 20;
+            this.numberOfRays = 30;
             this.angle = angle ? angle : 360;
             this.distance = distance != null ? distance : 200;
             this.isFullView = isFullView;
@@ -50,28 +50,28 @@ namespace Darkworld.Components {
             this.nightRaysLength = 200;
             this.lookAt = lookAt != null ? lookAt : true;
             this.dayNightSystemComponent = this.game.dWorld.getComponent("DayNightSystem") as DayNightSystem;
-            this.tiledFovLayer = this.game.dWorld.tileMap.create('tiledFov', this.game.dWorld.tileMap.width, this.game.dWorld.tileMap.height, this.game.dWorld.tileMap.tileWidth, this.game.dWorld.tileMap.tileHeight);
+            this.tiledFovLayer = this.game.dWorld.tileMap.createBlankLayer('tiledFov', this.game.dWorld.tileMap.width, this.game.dWorld.tileMap.height, this.game.dWorld.tileMap.tileWidth, this.game.dWorld.tileMap.tileHeight);
             this.tiledFovLayer.key = "tiledFovLayer";
 
             this.fovHitTiles = [];
             this.fovTiles = [];
-
             this.tileLine = [];
 
             if (this.dayNightSystemComponent) {
-                // create blocking layer
+                // create fov layer
                 for (var i = 0; i < this.game.dWorld.tileMap.width; i++) {
                     for (var j = 0; j < this.game.dWorld.tileMap.height; j++) {
-                        var tile = this.game.dWorld.tileMap.putTile(79, i, j, this.tiledFovLayer);
+                        //var tile = this.game.dWorld.tileMap.putDDTile(new Darkworld.Core.FovTile(this.game, this.tiledFovLayer, i, j), i, j);
+                        //var tile = this.game.dWorld.tileMap.putDTile(new Darkworld.Core.FovTile(this.game, this.tiledFovLayer, i, j));
+                        var tile = this.game.dWorld.tileMap.putTile(Darkworld.Utils.TileSetIndex.Fov.Fov, i, j, this.tiledFovLayer);
                         tile.alpha = this.visibleAlpha;
                         tile.isVisible = true;
                         this.fovTiles.push(tile);
                     }
                 }
 
-                this.game.dWorld.tileMap.setCollision([79]);
+                this.game.dWorld.tileMap.setCollision([Darkworld.Utils.TileSetIndex.Fov.Fov]);
             }
-
         }
 
         protected rayCast() {
@@ -86,7 +86,7 @@ namespace Darkworld.Components {
                     rotationInDegrees = rotationInDegrees - this.angle / 2;
 
                     newRotationInDegrees = rotationInDegrees + i * this.angle / this.numberOfRays;
-                }else{
+                } else {
                     newRotationInDegrees = i * this.angle / this.numberOfRays;
                 }
 
@@ -95,13 +95,7 @@ namespace Darkworld.Components {
                     this.entity.position.y,
                     this.entity.position.x + this.distance * Math.cos(newRotationInDegrees * (Math.PI / 180)),
                     this.entity.position.y + this.distance * Math.sin(newRotationInDegrees * (Math.PI / 180)));
-
-
-
                 let tileHits = this.blockingLayer.getRayCastTiles(ray, 4, true, false) as Darkworld.Core.DTile[];
-
-
-
 
                 if (tileHits.length > 0) {
                     try {
@@ -113,8 +107,9 @@ namespace Darkworld.Components {
                         linePoints.forEach(point => {
                             tileHits.forEach(tile => {
                                 if (tile.containsPoint(point[0], point[1])) {
-                                    debugger;
+
                                     if (!this.isFullView) {
+                                       
                                         ray.end.setTo(point[0], point[1]);
                                     }
                                     //add own tile to add hit tile list                          
