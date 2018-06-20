@@ -14,7 +14,8 @@
     "license": "ISC",
     "dependencies": {
         "express": "^4.16.3",
-        "require-dir": "^1.0.0"
+        "require-dir": "^1.0.0",
+        "pug": "^2.0.3"
     },
     "devDependencies": {
         "eslint": "^4.19.1",
@@ -29,7 +30,7 @@
         "gulp-uglify": "^3.0.0",
         "gulp-util": "^3.0.7",
         "phaser-ce": "^2.10.6",
-        "pug": "^2.0.3",
+
         "tslint": "^5.10.0",
         "typescript": "^2.9.1",
         "typescript-tools": "github:clausreinke/typescript-tools"
@@ -38,17 +39,15 @@
         "node": "7.1.0"
     },
     "eslintConfig": {
-        "overrides": [
-            {
-                "files": [
-                    "build/*.js",
-                    "lib/*.js"
-                ],
-                "excludedFiles": [
-                    "node_modules/*.js"
-                ]
-            }
-        ],
+        "overrides": [{
+            "files": [
+                "build/*.js",
+                "lib/*.js"
+            ],
+            "excludedFiles": [
+                "node_modules/*.js"
+            ]
+        }],
         "env": {
             "es6": true
         }
