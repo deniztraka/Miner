@@ -8,7 +8,11 @@ namespace Darkworld.Utils.TileSetIndex {
     }
 
     export enum Cave {
-        Stone = 64,
+        Stone = 65,
+        BadRock = 64,
+        BloodRock = 68,
+        WoodRock = 66,
+        IceRock = 67,
         FloorStart = 0,
         FloorEnd = 63
     }

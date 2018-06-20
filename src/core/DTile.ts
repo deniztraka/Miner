@@ -1,7 +1,7 @@
 namespace Darkworld.Core {
 
     export class DTile extends Phaser.Tile implements Darkworld.Components.IComponentBehaviour {
-        
+
         public customComponents: Array<Darkworld.Components.IComponent>;
         name: string;
         lastAlphaCheckTime: number = 0;
@@ -9,21 +9,34 @@ namespace Darkworld.Core {
         show = true;
         isVisible = true;
         isTweening = false;
-        game:DGame;
+        game: DGame;
 
-        constructor(layer: any, index: number, x: number, y: number, width: number, height: number,game:DGame) {
+        constructor(layer: any, index: number, x: number, y: number, width: number, height: number, game: DGame) {
 
             super(layer, index, x, y, width, height);
             this.game = game;
             this.customComponents = [];
 
             this.addComponents([
-                
+
             ]);
         }
 
-        clicked(): any {
-            console.log("Method not implemented.");
+        clicked(): any {     
+            
+            //if it is a destructable index
+            if (this.game.dWorld.tileMap.destructableIndexes.indexOf(this.index)==-1) {
+                return;
+            }
+
+            
+
+
+
+            this.game.dWorld.tileMap.removeTile(this.x, this.y, this.game.dWorld.tileMap.blockingLayer);
+            this.game.dWorld.tileMap.putTile(this.game.rnd.integerInRange(Darkworld.Utils.TileSetIndex.Dungeon.FloorStart, Darkworld.Utils.TileSetIndex.Dungeon.FloorEnd), this.x, this.y, this.game.dWorld.tileMap.floorLayer);//.alpha = 0;;
+            this.game.dWorld.tileMap.updateCollisions();
+            
         }
 
         addComponent(component: Darkworld.Components.IComponent) {

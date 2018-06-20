@@ -80,7 +80,7 @@ namespace Darkworld.Components {
 
             this.fovHitTiles = [];
             for (let i = 0; i < this.numberOfRays; i++) {
-                var newRotationInDegrees:number;
+                var newRotationInDegrees: number;
                 if (this.lookAt) {
                     var rotationInDegrees = (this.entity.rotation * 180 / Math.PI);
                     rotationInDegrees = rotationInDegrees - this.angle / 2;
@@ -109,7 +109,7 @@ namespace Darkworld.Components {
                                 if (tile.containsPoint(point[0], point[1])) {
 
                                     if (!this.isFullView) {
-                                       
+
                                         ray.end.setTo(point[0], point[1]);
                                     }
                                     //add own tile to add hit tile list                          
@@ -157,14 +157,14 @@ namespace Darkworld.Components {
                 //check every fov tile and set visibility if hit tile 
                 if (self.fovHitTiles.indexOf(fovTile) == -1) {
                     if (!fovTile.isVisible) {
-                        var tween = self.game.add.tween(fovTile).to({ alpha: self.visibleAlpha }, 500, "Linear", true);
+                        var tween = self.game.add.tween(fovTile).to({ alpha: self.visibleAlpha }, 250, "Linear", true);
                         tween.onComplete.add(function () {
                             fovTile.isVisible = true;
                         });
                     }
                 } else {
                     if (fovTile.isVisible) {
-                        var tween = self.game.add.tween(fovTile).to({ alpha: self.invisAlpha }, 500, "Linear", true);
+                        var tween = self.game.add.tween(fovTile).to({ alpha: self.invisAlpha }, 250, "Linear", true);
                         tween.onComplete.add(function () {
                             fovTile.isVisible = false;
                         });
