@@ -49,46 +49,6 @@ namespace Darkworld.Core {
             this.game.physics.p2.convertTilemap(this, this.blockingLayer);
         }
 
-
-        // putDTile(player: Darkworld.Entities.Mobiles.Humanoids.Player) {
-        //     var tilePlayer = this.getTileWorldXY(player.x, player.y)
-        //     //var tile = this.putTile(Darkworld.Utils.TileSetIndex.Dungeon.WallStart, tilePlayer.x, tilePlayer.y, this.blockingLayer);
-        //     var tile = new StoneTile( this.blockingLayer, tilePlayer.x, tilePlayer.y);
-        //     debugger;
-
-        //     var x = tile.x;
-        //     var y = tile.y;
-        //     var layer = tile.layer;
-
-        //     if (x >= 0 && x < this.layers[layer.index].width && y >= 0 && y < this.layers[layer.index].height) {
-        //         var index: any;
-
-
-        //         index = tile.index;
-
-        //         if (this.hasTile(x, y, layer)) {
-        //             this.layers[layer.index].data[y][x].copy(tile);
-        //         } else {
-        //             this.layers[layer.index].data[y][x] = tile;
-        //         }
-
-
-        //         if (this.collideIndexes.indexOf(index) > -1) {
-        //             this.layers[layer.index].data[y][x].setCollision(true, true, true, true);
-        //         } else {
-        //             this.layers[layer.index].data[y][x].resetCollision();
-        //         }
-
-        //         this.layers[layer.index].dirty = true;
-
-        //         this.calculateFaces(layer.index);
-
-        //         return this.layers[layer.index].data[y][x];
-        //     }
-        //     return null;
-
-        // }
-
         /* Private Methods */
         private updateMarker() {
             var currentTile = this.getTileWorldXY(this.game.input.activePointer.worldX, this.game.input.activePointer.worldY, this.tileWidth, this.tileHeight, this.blockingLayer) as Darkworld.Core.DTile;
@@ -96,12 +56,8 @@ namespace Darkworld.Core {
                 this.marker.x = currentTile.x * this.tileWidth;
                 this.marker.y = currentTile.y * this.tileHeight;
 
-                if (this.game.input.activePointer.isDown) {
-                    //console.log("x:"+currentTile.x+", y:"+currentTile.y + ", isVisible:" + currentTile.isVisible + ", alpha:" + currentTile.alpha + ", isTweening" + currentTile.isTweening);
-                    //console.log(currentTile.clickEvent);
-                    // currentTile.
-                    // currentTile.onClick();
-                    // currentTile.
+                if (this.game.input.activePointer.isDown) {                    
+                    currentTile.clicked();
                 }
             }
         }
@@ -119,7 +75,7 @@ namespace Darkworld.Core {
             }
 
             layer = this.getLayer(layer);
-            debugger;
+            
             if (x >= 0 && x < this.layers[layer].width && y >= 0 && y < this.layers[layer].height) {
                 var index: any;
 
@@ -181,7 +137,12 @@ namespace Darkworld.Core {
             let tiles: Darkworld.Core.DTile[] = [];
             for (var i = 0; i < this.width; i++) {
                 for (var j = 0; j < this.height; j++) {
-                    tiles.push(this.getTile(i, j, layer.name) as Darkworld.Core.DTile);
+                    var tile = this.getTile(i, j, layer.name) as Darkworld.Core.DTile;
+                    if(tile != null){
+                        debugger;
+                        tiles.push(tile);
+                    }
+                    
                 }
             }
 
@@ -195,12 +156,8 @@ namespace Darkworld.Core {
 
                 var tiles = self.getDTilesArray(layer) as Darkworld.Core.DTile[];
                 tiles.forEach(tile => {
-                    tile.customComponents.forEach(component => {
-                       component.update();
-    
-    
-                        
-                    });
+                    debugger;
+                    tile.update();
 
                     
                 });

@@ -80,7 +80,7 @@ namespace Darkworld.Components {
 
             this.fovHitTiles = [];
             for (let i = 0; i < this.numberOfRays; i++) {
-                var newRotationInDegrees;
+                var newRotationInDegrees:number;
                 if (this.lookAt) {
                     var rotationInDegrees = (this.entity.rotation * 180 / Math.PI);
                     rotationInDegrees = rotationInDegrees - this.angle / 2;

@@ -1,6 +1,7 @@
 namespace Darkworld.Core {
 
     export class DTile extends Phaser.Tile implements Darkworld.Components.IComponentBehaviour {
+        
         public customComponents: Array<Darkworld.Components.IComponent>;
         name: string;
         lastAlphaCheckTime: number = 0;
@@ -14,10 +15,15 @@ namespace Darkworld.Core {
 
             super(layer, index, x, y, width, height);
             this.game = game;
+            this.customComponents = [];
 
             this.addComponents([
-                new Darkworld.Components.OnTileClick(this.game,this)
+                
             ]);
+        }
+
+        clicked(): any {
+            console.log("Method not implemented.");
         }
 
         addComponent(component: Darkworld.Components.IComponent) {

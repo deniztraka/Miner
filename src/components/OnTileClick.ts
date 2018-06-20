@@ -19,7 +19,8 @@ namespace Darkworld.Components {
             //console.log(this.dTile);
             if (this.game.input.activePointer.isDown) {
                 //console.log("x:"+currentTile.x+", y:"+currentTile.y + ", isVisible:" + currentTile.isVisible + ", alpha:" + currentTile.alpha + ", isTweening" + currentTile.isTweening);
-                //console.log(this.dTile);
+                this.dTile.clicked();
+                debugger;
                 // currentTile.
                 // currentTile.onClick();
                 // currentTile.
