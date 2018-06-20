@@ -26,6 +26,8 @@ namespace Darkworld.Core {
             //let randomTileMapData = new Darkworld.Data.RandomTileMapData(this.game, 4, 13, 50, 38);
             let cellularAutomataGenerator = new Darkworld.Data.CellularAutomata(this.game, this.width, this.height, 0.4, 3, 4);
             let randomTileMapData = cellularAutomataGenerator.generateMap(true);
+            console.log(randomTileMapData.join("\n "));
+           
 
             // let customMapDataGenerator = new Darkworld.Data.TestCustomMap();
             // let randomTileMapData = customMapDataGenerator.generateMap(true);
@@ -33,16 +35,13 @@ namespace Darkworld.Core {
             //fill with floor first
             for (var i = 0; i < randomTileMapData.length; i++) {
                 for (var j = 0; j < randomTileMapData[i].length; j++) {
-                    this.putTile(this.game.rnd.integerInRange(Darkworld.Utils.TileSetIndex.Dungeon.FloorStart, Darkworld.Utils.TileSetIndex.Dungeon.FloorEnd), i, j);//.alpha = 0;;
+                    this.putTile(this.game.rnd.integerInRange(Darkworld.Utils.TileSetIndex.Cave.FloorStart, Darkworld.Utils.TileSetIndex.Cave.FloorEnd), i, j);//.alpha = 0;;
                 }
             }
 
 
 
             // create blocking layer
-
-            
-
             for (var i = 0; i < randomTileMapData.length; i++) {
                 for (var j = 0; j < randomTileMapData[i].length; j++) {
                     if (randomTileMapData[i][j] == 1) {
@@ -62,7 +61,7 @@ namespace Darkworld.Core {
 
             
 
-            this.enableTileMarker();
+            
             this.setCollision(this.collisionIndexes);
             this.game.physics.p2.convertTilemap(this, this.blockingLayer);
         }
@@ -88,6 +87,7 @@ namespace Darkworld.Core {
 
         /* Public Methods */
         enableTileMarker() {
+
             this.marker = new DTileMarker(this.game);
             this.game.input.addMoveCallback(this.updateMarker, this);
         }
@@ -108,7 +108,7 @@ namespace Darkworld.Core {
                     if (this.hasTile(x, y, layer)) {
                         this.layers[layer].data[y][x].copy(tile);
                     } else {
-                        this.layers[layer].data[y][x] = new Darkworld.Core.DTile(layer, index, x, y, 64, 64, this.game);
+                        this.layers[layer].data[y][x] = new Darkworld.Core.DTile(layer, index, x, y, this.tileWidth, this.tileHeight, this.game);
                     }
                 } else {
                     index = tile;
@@ -116,7 +116,7 @@ namespace Darkworld.Core {
                     if (this.hasTile(x, y, layer)) {
                         this.layers[layer].data[y][x].index = index;
                     } else {
-                        this.layers[layer].data[y][x] = new Darkworld.Core.DTile(this.layers[layer], index, x, y, 64, 64, this.game);
+                        this.layers[layer].data[y][x] = new Darkworld.Core.DTile(this.layers[layer], index, x, y, this.tileWidth, this.tileHeight, this.game);
                     }
                 }
 

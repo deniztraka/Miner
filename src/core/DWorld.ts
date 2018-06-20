@@ -17,7 +17,8 @@ namespace Darkworld.Core {
             this.customComponents = [];
             this.game = game;            
 
-            this.tileMap = new DTileMap(this.game, null, this.tileResolution, this.tileResolution, this.mapWidth, this.mapHeight);                       
+            this.tileMap = new DTileMap(this.game, null, this.tileResolution, this.tileResolution, this.mapWidth, this.mapHeight);     
+                              
         }
 
         
