@@ -107,6 +107,8 @@ namespace Darkworld.Core {
                     component.debugRender();
                 }
             });
+            this.game.debug.text("number of treasures: "+this.treasures.length.toString(), 10, this.game.height-30, "#cccccc");
+            this.game.debug.text("number of close treasures left: "+this.treasures.filter(function(treasure){return !treasure.isOpened;}).length.toString(), 10, this.game.height-10, "#cccccc");
         }
     }
 }

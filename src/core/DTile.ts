@@ -22,6 +22,13 @@ namespace Darkworld.Core {
             ]);
         }
 
+        isItCloseEnoughToPlayer():boolean{
+            
+            var distanceFromPlayer = Phaser.Math.distance(this.game.player.worldPosition.x,this.game.player.worldPosition.y,this.worldX+this.width/2,this.worldY+this.height/2); // 103.07764064044152
+            console.log(distanceFromPlayer);
+            return distanceFromPlayer<=50;
+        }
+
         clicked(): any {     
             
             //if it is a destructable index
@@ -29,7 +36,9 @@ namespace Darkworld.Core {
                 return;
             }
 
-            
+            if(!this.isItCloseEnoughToPlayer()){
+                return;
+            }
 
 
 

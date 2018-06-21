@@ -113078,9 +113078,17 @@ var Darkworld;
                 this.customComponents = [];
                 this.addComponents([]);
             }
+            DTile.prototype.isItCloseEnoughToPlayer = function () {
+                var distanceFromPlayer = Phaser.Math.distance(this.game.player.worldPosition.x, this.game.player.worldPosition.y, this.worldX + this.width / 2, this.worldY + this.height / 2); // 103.07764064044152
+                console.log(distanceFromPlayer);
+                return distanceFromPlayer <= 50;
+            };
             DTile.prototype.clicked = function () {
                 //if it is a destructable index
                 if (this.game.dWorld.tileMap.destructableIndexes.indexOf(this.index) == -1) {
+                    return;
+                }
+                if (!this.isItCloseEnoughToPlayer()) {
                     return;
                 }
                 this.game.dWorld.tileMap.removeTile(this.x, this.y, this.game.dWorld.tileMap.blockingLayer);
@@ -113684,6 +113692,8 @@ var Darkworld;
                         component.debugRender();
                     }
                 });
+                this.game.debug.text("number of treasures: " + this.treasures.length.toString(), 10, this.game.height - 30, "#cccccc");
+                this.game.debug.text("number of close treasures left: " + this.treasures.filter(function (treasure) { return !treasure.isOpened; }).length.toString(), 10, this.game.height - 10, "#cccccc");
             };
             return DWorld;
         }());
@@ -114101,7 +114111,7 @@ var Darkworld;
                 var dayNightCycleComponent = this.game.dWorld.getComponent("DayNightSystem");
                 if (dayNightCycleComponent != null) {
                 }
-                this.player = this.game.dWorld.addPlayer(true, 96, 96);
+                this.game.player = this.game.dWorld.addPlayer(true, 96, 96);
                 //this.game.dWorld.tileMap.putDTile(this.player);
                 //let torch = new Darkworld.Entities.Items.Torch(this.game, this.player.x+50, this.player.y+50);
                 // let torch1 = new Darkworld.Entities.Items.Torch(this.game,500,450);
@@ -114193,6 +114203,38 @@ var Darkworld;
 (function (Darkworld) {
     var Entities;
     (function (Entities) {
+        var Mobiles;
+        (function (Mobiles) {
+            var Mobile = (function (_super) {
+                __extends(Mobile, _super);
+                function Mobile(game, x, y, key, frame) {
+                    _super.call(this, game, x, y, key, frame);
+                    this.speed = 100;
+                }
+                Mobile.prototype.update = function () {
+                    _super.prototype.update.call(this);
+                };
+                ;
+                Mobile.prototype.debugRender = function () {
+                    _super.prototype.debugRender.call(this);
+                };
+                ;
+                return Mobile;
+            }(Darkworld.Entities.Entity));
+            Mobiles.Mobile = Mobile;
+        })(Mobiles = Entities.Mobiles || (Entities.Mobiles = {}));
+    })(Entities = Darkworld.Entities || (Darkworld.Entities = {}));
+})(Darkworld || (Darkworld = {}));
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Darkworld;
+(function (Darkworld) {
+    var Entities;
+    (function (Entities) {
         var Items;
         (function (Items) {
             var BaseItem = (function (_super) {
@@ -114234,6 +114276,7 @@ var Darkworld;
                     this.fovDistance = 15;
                     this.anchor.setTo(0.5, 0.5);
                     this.isOpened = false;
+                    this.game = game;
                     var fovComponent = new Darkworld.Components.Fov(game, this, 0, 0, 'rgba(255, 191, 0, 1.0)', 'rgba(255, 191, 0, 0.0)', 50);
                     fovComponent.numberOfRays = 12;
                     this.addComponents([fovComponent]);
@@ -114241,10 +114284,14 @@ var Darkworld;
                     this.events.onInputDown.add(this.onClick, this);
                 }
                 Chest.prototype.onClick = function () {
-                    if (!this.isOpened) {
+                    if (!this.isOpened && this.isItCloseEnoughToPlayer()) {
                         this.isOpened = true;
                         this.frame = 1;
                     }
+                };
+                Chest.prototype.isItCloseEnoughToPlayer = function () {
+                    var distanceFromPlayer = Phaser.Math.distance(this.game.player.worldPosition.x, this.game.player.worldPosition.y, this.worldPosition.x, this.worldPosition.y); // 103.07764064044152
+                    return distanceFromPlayer <= 50;
                 };
                 Chest.prototype.update = function () {
                     _super.prototype.update.call(this);
@@ -114339,38 +114386,6 @@ var Darkworld;
     (function (Entities) {
         var Mobiles;
         (function (Mobiles) {
-            var Mobile = (function (_super) {
-                __extends(Mobile, _super);
-                function Mobile(game, x, y, key, frame) {
-                    _super.call(this, game, x, y, key, frame);
-                    this.speed = 100;
-                }
-                Mobile.prototype.update = function () {
-                    _super.prototype.update.call(this);
-                };
-                ;
-                Mobile.prototype.debugRender = function () {
-                    _super.prototype.debugRender.call(this);
-                };
-                ;
-                return Mobile;
-            }(Darkworld.Entities.Entity));
-            Mobiles.Mobile = Mobile;
-        })(Mobiles = Entities.Mobiles || (Entities.Mobiles = {}));
-    })(Entities = Darkworld.Entities || (Darkworld.Entities = {}));
-})(Darkworld || (Darkworld = {}));
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var Darkworld;
-(function (Darkworld) {
-    var Entities;
-    (function (Entities) {
-        var Mobiles;
-        (function (Mobiles) {
             var Humanoids;
             (function (Humanoids) {
                 var Humanoid = (function (_super) {
@@ -114417,7 +114432,7 @@ var Darkworld;
                         this.body.fixedRotation = true;
                         //Add components here
                         this.addComponents([
-                            new Darkworld.Components.LookAtMouse(game, this),
+                            //new Darkworld.Components.LookAtMouse(game, this),
                             new Darkworld.Components.KeyboardMovement(game, this)
                         ]);
                         this.addFov();

@@ -1,7 +1,8 @@
 namespace Darkworld {
 
     export class DGame extends Phaser.Game { 
-        dWorld:Darkworld.Core.DWorld;        
+        dWorld:Darkworld.Core.DWorld;  
+        player:Darkworld.Entities.Mobiles.Humanoids.Player;      
         
         constructor() {
             super(800, 608, Phaser.AUTO);            
