@@ -99,14 +99,22 @@ namespace Darkworld.Core {
             var currentTile = this.getTileWorldXY(this.game.input.activePointer.worldX, this.game.input.activePointer.worldY, this.tileWidth, this.tileHeight, this.blockingLayer) as Darkworld.Core.DTile;
             if (currentTile != null && this.destructableIndexes.indexOf(currentTile.index) > -1) {
                 this.marker.alpha = 1;
+                if(currentTile.isItCloseEnoughToPlayer()){
+                    this.marker.icon.alpha = 1;
+                }else{
+                    this.marker.icon.alpha = 0;
+                }
+                
                 this.marker.x = currentTile.x * this.tileWidth;
                 this.marker.y = currentTile.y * this.tileHeight;
-
+                this.marker.icon.x = this.marker.x+this.tileWidth/2;
+                this.marker.icon.y = this.marker.y+this.tileHeight/2;
                 if (this.game.input.activePointer.isDown) {
                     currentTile.clicked();
                 }
             } else {
                 this.marker.alpha = 0;
+                this.marker.icon.alpha = 0;                
             }
         }
 
