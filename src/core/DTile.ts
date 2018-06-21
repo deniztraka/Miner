@@ -16,7 +16,7 @@ namespace Darkworld.Core {
             super(layer, index, x, y, width, height);
             this.game = game;
             this.customComponents = [];
-
+            
             this.addComponents([
 
             ]);

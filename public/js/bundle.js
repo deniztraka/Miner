@@ -113032,195 +113032,6 @@ var Darkworld;
     })(Components = Darkworld.Components || (Darkworld.Components = {}));
 })(Darkworld || (Darkworld = {}));
 
-var Darkworld;
-(function (Darkworld) {
-    var Data;
-    (function (Data) {
-        var CellularAutomata = (function () {
-            function CellularAutomata(game, width, height, chanceToStartAlive, deathLimit, birthLimit) {
-                this.game = game;
-                this.width = width;
-                this.height = height;
-                this.cellmap = [];
-                this.chanceToStartAlive = chanceToStartAlive ? chanceToStartAlive : 0.45;
-                this.deathLimit = deathLimit;
-                this.birthLimit = birthLimit;
-                this.numberOfSteps = 2;
-                //map constructor
-                for (var i = 0; i < width; i++) {
-                    this.cellmap[i] = [];
-                    for (var j = 0; j < height; j++) {
-                        this.cellmap[i][j] = 0;
-                    }
-                }
-                //initialize it with random values
-                this.initialiseMap();
-            }
-            CellularAutomata.prototype.generateMap = function (fillSides) {
-                //And now run the simulation for a set number of steps
-                for (var i = 0; i < this.numberOfSteps; i++) {
-                    this.cellmap = this.doSimulationStep();
-                }
-                if (fillSides) {
-                    //filling sides
-                    for (var x = 0; x < this.width; x++) {
-                        for (var y = 0; y < this.height; y++) {
-                            if (x == 0 || y == 0 || x == this.width - 1 || y == this.height - 1) {
-                                this.cellmap[x][y] = 1;
-                            }
-                        }
-                    }
-                }
-                //random map is generated
-                //now trying to shutdown closed areas            
-                var openCellFound = false;
-                while (!openCellFound) {
-                    var closedCellCount = 0;
-                    var randomX = this.game.rnd.integerInRange(0, this.width);
-                    var randomY = this.game.rnd.integerInRange(0, this.height);
-                    if (this.cellmap[randomX][randomY] == 0) {
-                        openCellFound = true; //we found an open cell
-                    }
-                }
-                return this.cellmap;
-            };
-            CellularAutomata.prototype.floodFill = function (x, y, oldVal, newVal) {
-                var mapWidth = this.cellmap.length, mapHeight = this.cellmap[0].length;
-                if (oldVal == null) {
-                    oldVal = this.cellmap[x][y];
-                }
-                if (this.cellmap[x][y] !== oldVal) {
-                    return true;
-                }
-                this.cellmap[x][y] = newVal;
-                if (x > 0) {
-                    this.floodFill(x - 1, y, oldVal, newVal);
-                }
-                if (y > 0) {
-                    this.floodFill(x, y - 1, oldVal, newVal);
-                }
-                if (x < mapWidth - 1) {
-                    this.floodFill(x + 1, y, oldVal, newVal);
-                }
-                if (y < mapHeight - 1) {
-                    this.floodFill(x, y + 1, oldVal, newVal);
-                }
-            };
-            CellularAutomata.prototype.initialiseMap = function () {
-                for (var x = 0; x < this.width; x++) {
-                    for (var y = 0; y < this.height; y++) {
-                        if (this.game.rnd.frac() < this.chanceToStartAlive) {
-                            this.cellmap[x][y] = 1;
-                        }
-                    }
-                }
-            };
-            //Returns the number of cells in a ring around (x,y) that are alive.
-            CellularAutomata.prototype.countAliveNeighbours = function (map, x, y) {
-                var count = 0;
-                for (var i = -1; i < 2; i++) {
-                    for (var j = -1; j < 2; j++) {
-                        var neighbour_x = x + i;
-                        var neighbour_y = y + j;
-                        //If we're looking at the middle point
-                        if (i == 0 && j == 0) {
-                        }
-                        else if (neighbour_x < 0 || neighbour_y < 0 || neighbour_x >= map.length || neighbour_y >= map[0].length) {
-                            count = count + 1;
-                        }
-                        else if (map[neighbour_x][neighbour_y] == 1) {
-                            count = count + 1;
-                        }
-                    }
-                }
-                return count;
-            };
-            CellularAutomata.prototype.doSimulationStep = function () {
-                var newMap = [];
-                //map constructor
-                for (var i = 0; i < this.width; i++) {
-                    newMap[i] = [];
-                    for (var j = 0; j < this.height; j++) {
-                        newMap[i][j] = 1;
-                    }
-                }
-                //Loop over each row and column of the map
-                for (var x = 0; x < this.cellmap.length; x++) {
-                    for (var y = 0; y < this.cellmap[0].length; y++) {
-                        var nbs = this.countAliveNeighbours(this.cellmap, x, y);
-                        //The new value is based on our simulation rules
-                        //First, if a cell is alive but has too few neighbours, kill it.
-                        if (this.cellmap[x][y] == 1) {
-                            if (nbs < this.deathLimit) {
-                                newMap[x][y] = 0;
-                            }
-                            else {
-                                newMap[x][y] = 1;
-                            }
-                        } //Otherwise, if the cell is dead now, check if it has the right number of neighbours to be 'born'
-                        else {
-                            if (nbs > this.birthLimit) {
-                                newMap[x][y] = 1;
-                            }
-                            else {
-                                newMap[x][y] = 0;
-                            }
-                        }
-                    }
-                }
-                return newMap;
-            };
-            return CellularAutomata;
-        }());
-        Data.CellularAutomata = CellularAutomata;
-    })(Data = Darkworld.Data || (Darkworld.Data = {}));
-})(Darkworld || (Darkworld = {}));
-
-
-
-var Darkworld;
-(function (Darkworld) {
-    var Data;
-    (function (Data) {
-        var RandomTileMapData = (function () {
-            function RandomTileMapData(game, min, max, width, height) {
-                this.data = [];
-                for (var i = 0; i < width; i++) {
-                    this.data[i] = [];
-                    for (var j = 0; j < height; j++) {
-                        this.data[i][j] = game.rnd.integerInRange(min, max);
-                    }
-                }
-            }
-            return RandomTileMapData;
-        }());
-        Data.RandomTileMapData = RandomTileMapData;
-    })(Data = Darkworld.Data || (Darkworld.Data = {}));
-})(Darkworld || (Darkworld = {}));
-
-var Darkworld;
-(function (Darkworld) {
-    var Data;
-    (function (Data) {
-        var TestCustomMap = (function () {
-            function TestCustomMap() {
-            }
-            TestCustomMap.prototype.generateMap = function (fillSides) {
-                var data = [
-                    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                    [1, 0, 0, 1, 1, 0, 0, 1, 0, 1],
-                    [1, 0, 0, 1, 1, 0, 0, 0, 0, 1],
-                    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-                    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-                ];
-                return data;
-            };
-            return TestCustomMap;
-        }());
-        Data.TestCustomMap = TestCustomMap;
-    })(Data = Darkworld.Data || (Darkworld.Data = {}));
-})(Darkworld || (Darkworld = {}));
-
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -113882,6 +113693,195 @@ var Darkworld;
 
 var Darkworld;
 (function (Darkworld) {
+    var Data;
+    (function (Data) {
+        var CellularAutomata = (function () {
+            function CellularAutomata(game, width, height, chanceToStartAlive, deathLimit, birthLimit) {
+                this.game = game;
+                this.width = width;
+                this.height = height;
+                this.cellmap = [];
+                this.chanceToStartAlive = chanceToStartAlive ? chanceToStartAlive : 0.45;
+                this.deathLimit = deathLimit;
+                this.birthLimit = birthLimit;
+                this.numberOfSteps = 2;
+                //map constructor
+                for (var i = 0; i < width; i++) {
+                    this.cellmap[i] = [];
+                    for (var j = 0; j < height; j++) {
+                        this.cellmap[i][j] = 0;
+                    }
+                }
+                //initialize it with random values
+                this.initialiseMap();
+            }
+            CellularAutomata.prototype.generateMap = function (fillSides) {
+                //And now run the simulation for a set number of steps
+                for (var i = 0; i < this.numberOfSteps; i++) {
+                    this.cellmap = this.doSimulationStep();
+                }
+                if (fillSides) {
+                    //filling sides
+                    for (var x = 0; x < this.width; x++) {
+                        for (var y = 0; y < this.height; y++) {
+                            if (x == 0 || y == 0 || x == this.width - 1 || y == this.height - 1) {
+                                this.cellmap[x][y] = 1;
+                            }
+                        }
+                    }
+                }
+                //random map is generated
+                //now trying to shutdown closed areas            
+                var openCellFound = false;
+                while (!openCellFound) {
+                    var closedCellCount = 0;
+                    var randomX = this.game.rnd.integerInRange(0, this.width);
+                    var randomY = this.game.rnd.integerInRange(0, this.height);
+                    if (this.cellmap[randomX][randomY] == 0) {
+                        openCellFound = true; //we found an open cell
+                    }
+                }
+                return this.cellmap;
+            };
+            CellularAutomata.prototype.floodFill = function (x, y, oldVal, newVal) {
+                var mapWidth = this.cellmap.length, mapHeight = this.cellmap[0].length;
+                if (oldVal == null) {
+                    oldVal = this.cellmap[x][y];
+                }
+                if (this.cellmap[x][y] !== oldVal) {
+                    return true;
+                }
+                this.cellmap[x][y] = newVal;
+                if (x > 0) {
+                    this.floodFill(x - 1, y, oldVal, newVal);
+                }
+                if (y > 0) {
+                    this.floodFill(x, y - 1, oldVal, newVal);
+                }
+                if (x < mapWidth - 1) {
+                    this.floodFill(x + 1, y, oldVal, newVal);
+                }
+                if (y < mapHeight - 1) {
+                    this.floodFill(x, y + 1, oldVal, newVal);
+                }
+            };
+            CellularAutomata.prototype.initialiseMap = function () {
+                for (var x = 0; x < this.width; x++) {
+                    for (var y = 0; y < this.height; y++) {
+                        if (this.game.rnd.frac() < this.chanceToStartAlive) {
+                            this.cellmap[x][y] = 1;
+                        }
+                    }
+                }
+            };
+            //Returns the number of cells in a ring around (x,y) that are alive.
+            CellularAutomata.prototype.countAliveNeighbours = function (map, x, y) {
+                var count = 0;
+                for (var i = -1; i < 2; i++) {
+                    for (var j = -1; j < 2; j++) {
+                        var neighbour_x = x + i;
+                        var neighbour_y = y + j;
+                        //If we're looking at the middle point
+                        if (i == 0 && j == 0) {
+                        }
+                        else if (neighbour_x < 0 || neighbour_y < 0 || neighbour_x >= map.length || neighbour_y >= map[0].length) {
+                            count = count + 1;
+                        }
+                        else if (map[neighbour_x][neighbour_y] == 1) {
+                            count = count + 1;
+                        }
+                    }
+                }
+                return count;
+            };
+            CellularAutomata.prototype.doSimulationStep = function () {
+                var newMap = [];
+                //map constructor
+                for (var i = 0; i < this.width; i++) {
+                    newMap[i] = [];
+                    for (var j = 0; j < this.height; j++) {
+                        newMap[i][j] = 1;
+                    }
+                }
+                //Loop over each row and column of the map
+                for (var x = 0; x < this.cellmap.length; x++) {
+                    for (var y = 0; y < this.cellmap[0].length; y++) {
+                        var nbs = this.countAliveNeighbours(this.cellmap, x, y);
+                        //The new value is based on our simulation rules
+                        //First, if a cell is alive but has too few neighbours, kill it.
+                        if (this.cellmap[x][y] == 1) {
+                            if (nbs < this.deathLimit) {
+                                newMap[x][y] = 0;
+                            }
+                            else {
+                                newMap[x][y] = 1;
+                            }
+                        } //Otherwise, if the cell is dead now, check if it has the right number of neighbours to be 'born'
+                        else {
+                            if (nbs > this.birthLimit) {
+                                newMap[x][y] = 1;
+                            }
+                            else {
+                                newMap[x][y] = 0;
+                            }
+                        }
+                    }
+                }
+                return newMap;
+            };
+            return CellularAutomata;
+        }());
+        Data.CellularAutomata = CellularAutomata;
+    })(Data = Darkworld.Data || (Darkworld.Data = {}));
+})(Darkworld || (Darkworld = {}));
+
+
+
+var Darkworld;
+(function (Darkworld) {
+    var Data;
+    (function (Data) {
+        var RandomTileMapData = (function () {
+            function RandomTileMapData(game, min, max, width, height) {
+                this.data = [];
+                for (var i = 0; i < width; i++) {
+                    this.data[i] = [];
+                    for (var j = 0; j < height; j++) {
+                        this.data[i][j] = game.rnd.integerInRange(min, max);
+                    }
+                }
+            }
+            return RandomTileMapData;
+        }());
+        Data.RandomTileMapData = RandomTileMapData;
+    })(Data = Darkworld.Data || (Darkworld.Data = {}));
+})(Darkworld || (Darkworld = {}));
+
+var Darkworld;
+(function (Darkworld) {
+    var Data;
+    (function (Data) {
+        var TestCustomMap = (function () {
+            function TestCustomMap() {
+            }
+            TestCustomMap.prototype.generateMap = function (fillSides) {
+                var data = [
+                    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                    [1, 0, 0, 1, 1, 0, 0, 1, 0, 1],
+                    [1, 0, 0, 1, 1, 0, 0, 0, 0, 1],
+                    [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+                ];
+                return data;
+            };
+            return TestCustomMap;
+        }());
+        Data.TestCustomMap = TestCustomMap;
+    })(Data = Darkworld.Data || (Darkworld.Data = {}));
+})(Darkworld || (Darkworld = {}));
+
+var Darkworld;
+(function (Darkworld) {
     var Engines;
     (function (Engines) {
         var InputHandler = (function () {
@@ -114232,10 +114232,19 @@ var Darkworld;
                     this.level = 0;
                     this.fovDistance = 15;
                     this.anchor.setTo(0.5, 0.5);
+                    this.isOpened = false;
                     var fovComponent = new Darkworld.Components.Fov(game, this, 0, 0, 'rgba(255, 191, 0, 1.0)', 'rgba(255, 191, 0, 0.0)', 50);
                     fovComponent.numberOfRays = 12;
                     this.addComponents([fovComponent]);
+                    this.inputEnabled = true;
+                    this.events.onInputDown.add(this.onClick, this);
                 }
+                Chest.prototype.onClick = function () {
+                    if (!this.isOpened) {
+                        this.isOpened = true;
+                        this.frame = 1;
+                    }
+                };
                 Chest.prototype.update = function () {
                     _super.prototype.update.call(this);
                 };
