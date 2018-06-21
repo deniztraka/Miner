@@ -17,20 +17,23 @@ namespace Darkworld.States {
 
             debugger;
             this.game.dWorld = new Darkworld.Core.DWorld(this.game);
-            this.game.dWorld.tileMap.enableTileMarker();
-            //this.game.dWorld.addComponent(new Darkworld.Components.DayNightSystem(this.game));
+            this.game.dWorld.tileMap.enableTileMarker();            
+            this.game.dWorld.addComponent(new Darkworld.Components.DayNightSystem(this.game));
+
+
+            this.game.dWorld.placeTreasures();
 
             //start day night cycle asdasd
-            // let dayNightCycleComponent = this.game.dWorld.getComponent("DayNightSystem") as Darkworld.Components.DayNightSystem;
-            // if (dayNightCycleComponent != null) {
-            //     //dayNightCycleComponent.startCycle();
-            // } 
+            let dayNightCycleComponent = this.game.dWorld.getComponent("DayNightSystem") as Darkworld.Components.DayNightSystem;
+            if (dayNightCycleComponent != null) {
+                //dayNightCycleComponent.startCycle();
+            } 
   
             this.player = this.game.dWorld.addPlayer(true,96,96);
 
             //this.game.dWorld.tileMap.putDTile(this.player);
 
-            // let torch = new Darkworld.Entities.Items.Torch(this.game, this.player.x+50, this.player.y+50);
+            //let torch = new Darkworld.Entities.Items.Torch(this.game, this.player.x+50, this.player.y+50);
 
             // let torch1 = new Darkworld.Entities.Items.Torch(this.game,500,450);
 

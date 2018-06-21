@@ -59,26 +59,26 @@ namespace Darkworld.Data {
                     openCellFound = true; //we found an open cell
 
                     //set flood areas to index 2
-                    this.floodFill(randomX, randomY, 0, 2);
+                    // this.floodFill(randomX, randomY, 0, 2);
 
                     
-                    //set wall other open areas
-                    for (var x = 0; x < this.width; x++) {
-                        for (var y = 0; y < this.height; y++) {
-                            if (this.cellmap[x][y] == 0) {
-                                this.cellmap[x][y] = 1;
-                            }
-                        }
-                    }
+                    // //set wall other open areas
+                    // for (var x = 0; x < this.width; x++) {
+                    //     for (var y = 0; y < this.height; y++) {
+                    //         if (this.cellmap[x][y] == 0) {
+                    //             this.cellmap[x][y] = 1;
+                    //         }
+                    //     }
+                    // }
 
-                    //set open flooded areas
-                    for (var x = 0; x < this.width; x++) {
-                        for (var y = 0; y < this.height; y++) {
-                            if (this.cellmap[x][y] == 2) {
-                                this.cellmap[x][y] = 0;
-                            }
-                        }
-                    }
+                    // //set open flooded areas
+                    // for (var x = 0; x < this.width; x++) {
+                    //     for (var y = 0; y < this.height; y++) {
+                    //         if (this.cellmap[x][y] == 2) {
+                    //             this.cellmap[x][y] = 0;
+                    //         }
+                    //     }
+                    // }
                 }
             }
 

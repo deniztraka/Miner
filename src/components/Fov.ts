@@ -3,12 +3,12 @@ namespace Darkworld.Components {
         protected game: DGame;
         protected entity: Darkworld.Entities.Entity;
 
-        protected numberOfRays: number;
+        public numberOfRays: number;
         protected rays: Phaser.Line[];
         protected points: Phaser.Point[];
         private shadowTexture: Phaser.BitmapData;
         private shadowSprite: Phaser.Sprite;
-        protected debug: boolean;
+        public debug: boolean;
         protected isFullView: boolean;
         protected offSetX: number;
         protected offSetY: number;
@@ -35,7 +35,7 @@ namespace Darkworld.Components {
             this.offSetY = offSetY;
 
             this.dayNightSystemComponent = this.game.dWorld.getComponent("DayNightSystem") as DayNightSystem;
-            this.numberOfRays = 100;
+            this.numberOfRays = 5;
             this.angle = angle != null ? angle : 360;
             this.flare = flare != null ? flare : false;
             this.addEntityPoint = angle != null;

@@ -24,10 +24,10 @@ namespace Darkworld.Core {
 
             //fill map random
             //let randomTileMapData = new Darkworld.Data.RandomTileMapData(this.game, 4, 13, 50, 38);
-            let cellularAutomataGenerator = new Darkworld.Data.CellularAutomata(this.game, this.width, this.height, 0.6, 3, 4);
+            let cellularAutomataGenerator = new Darkworld.Data.CellularAutomata(this.game, this.width, this.height, 0.45, 3, 4);
             let randomTileMapData = cellularAutomataGenerator.generateMap(true);
-            
-            
+            console.log(randomTileMapData.join("\n "));
+
 
 
             // let customMapDataGenerator = new Darkworld.Data.TestCustomMap();
@@ -65,6 +65,32 @@ namespace Darkworld.Core {
 
             this.setCollision(this.collisionIndexes);
             this.game.physics.p2.convertTilemap(this, this.blockingLayer);
+        }
+
+        countBlockingNeighbours(x: number, y: number): number {
+            let count = 0;
+            for (let i = -1; i < 2; i++) {
+                for (let j = -1; j < 2; j++) {
+                    let neighbour_x = x + i;
+                    let neighbour_y = y + j;
+                    //If we're looking at the middle point
+                    if (i == 0 && j == 0) {
+                        //Do nothing, we don't want to add ourselves in!
+                    }
+                    //In case the index we're looking at it off the edge of the map
+                    else if (neighbour_x < 0 || neighbour_y < 0 || neighbour_x >= this.width || neighbour_y >= this.height) {
+                        count = count + 1;
+                    }
+                    //Otherwise, a normal check of the neighbour
+                    else {
+                        var tile = this.getTile(neighbour_x, neighbour_y, this.blockingLayer);
+                        if (this.collideIndexes.indexOf(tile.index) > -1) {
+                            count = count + 1;
+                        } 
+                    }
+                }
+            }
+            return count;
         }
 
         /* Private Methods */

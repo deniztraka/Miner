@@ -29,6 +29,8 @@ namespace Darkworld.Entities.Mobiles.Humanoids {
         };
 
         private addFov() {
+            var playerFov = new Darkworld.Components.Fov(this.game as DGame, this, 0, 0, 'rgba(252, 233, 106, 0.9)', 'rgba(255, 255, 255, 0.0)', 300, true);
+            playerFov.numberOfRays = 9;
             this.addComponents([
                 // new Darkworld.Components.Fov(this.game as DGame,this,-15,0,'rgba(252, 233, 106, 1.0)','rgba(255, 255, 255, 0.0)',350,false,60,true),
                 // new Darkworld.Components.Fov(this.game as DGame,this,15,0,'rgba(252, 233, 106, 1.0)','rgba(255, 255, 255, 0.0)',350,false,60,true),
@@ -39,8 +41,7 @@ namespace Darkworld.Entities.Mobiles.Humanoids {
                 // new Darkworld.Components.Fov(this.game as DGame,this,-15,-15,'rgba(252, 233, 106, 1.0)','rgba(255, 255, 255, 0.0)',350,false,60,true),
                 // new Darkworld.Components.Fov(this.game as DGame,this,-15,15,'rgba(252, 233, 106, 1.0)','rgba(255, 255, 255, 0.0)',350,false,60,true),
                 // new Darkworld.Components.Fov(this.game as DGame,this,0,0,'rgba(252, 233, 106, 1.0)','rgba(255, 255, 255, 0.0)',350,false,60,true),
-                
-                new Darkworld.Components.Fov(this.game as DGame, this, 0, 0, 'rgba(252, 233, 106, 0.9)', 'rgba(255, 255, 255, 0.0)', 300, true),
+                playerFov,
                 new Darkworld.Components.TiledFov(this.game as DGame, this, null, 360, false, false)
             ]);
 
