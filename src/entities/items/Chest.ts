@@ -4,7 +4,7 @@ namespace Darkworld.Entities.Items{
         fovDistance:number;
         isOpened:boolean;
         game:DGame;
-        
+
         constructor(game:Darkworld.DGame,x:number,y:number){
             super(game,x,y,"chests",null);            
             this.level = 0;
@@ -32,7 +32,7 @@ namespace Darkworld.Entities.Items{
             
             var distanceFromPlayer = Phaser.Math.distance(this.game.player.worldPosition.x,this.game.player.worldPosition.y,this.worldPosition.x,this.worldPosition.y); // 103.07764064044152
             
-            return distanceFromPlayer<=50;
+            return distanceFromPlayer<=this.game.player.effectiveDistance;
         }
 
         update(){

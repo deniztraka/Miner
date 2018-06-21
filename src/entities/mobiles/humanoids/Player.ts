@@ -1,11 +1,13 @@
 namespace Darkworld.Entities.Mobiles.Humanoids {
     export class Player extends Darkworld.Entities.Mobiles.Humanoids.Humanoid {
+        effectiveDistance:number;
         constructor(game: Darkworld.DGame, x: number, y: number) {
             super(game, x, y, 'playerImg', null);
             game.physics.p2.enable(this);
             this.speed = 100;
             this.body.setZeroDamping();
             this.body.fixedRotation = true;
+            this.effectiveDistance = 50;
 
             //Add components here
             this.addComponents([

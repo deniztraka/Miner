@@ -25,7 +25,7 @@ namespace Darkworld.Core {
         isItCloseEnoughToPlayer(): boolean {
 
             var distanceFromPlayer = Phaser.Math.distance(this.game.player.position.x, this.game.player.position.y, this.worldX + this.width / 2, this.worldY + this.height / 2); // 103.07764064044152
-            return distanceFromPlayer <= 50;
+            return distanceFromPlayer <= this.game.player.effectiveDistance;
         }
 
         clicked(): any {
@@ -35,12 +35,9 @@ namespace Darkworld.Core {
                 return;
             }
 
-            debugger;
             if (!this.isItCloseEnoughToPlayer()) {
                 return;
             }
-
-
 
             this.game.dWorld.tileMap.removeTile(this.x, this.y, this.game.dWorld.tileMap.blockingLayer);
             this.game.dWorld.tileMap.putTile(this.game.rnd.integerInRange(Darkworld.Utils.TileSetIndex.Dungeon.FloorStart, Darkworld.Utils.TileSetIndex.Dungeon.FloorEnd), this.x, this.y, this.game.dWorld.tileMap.floorLayer);//.alpha = 0;;
