@@ -16,27 +16,28 @@ namespace Darkworld.Core {
             super(layer, index, x, y, width, height);
             this.game = game;
             this.customComponents = [];
-            
+
             this.addComponents([
 
             ]);
         }
 
-        isItCloseEnoughToPlayer():boolean{
-            
-            var distanceFromPlayer = Phaser.Math.distance(this.game.player.worldPosition.x,this.game.player.worldPosition.y,this.worldX+this.width/2,this.worldY+this.height/2); // 103.07764064044152
+        isItCloseEnoughToPlayer(): boolean {
+
+            var distanceFromPlayer = Phaser.Math.distance(this.game.player.position.x, this.game.player.position.y, this.worldX + this.width / 2, this.worldY + this.height / 2); // 103.07764064044152
             console.log(distanceFromPlayer);
-            return distanceFromPlayer<=50;
+            return distanceFromPlayer <= 50;
         }
 
-        clicked(): any {     
-            
+        clicked(): any {
+
             //if it is a destructable index
-            if (this.game.dWorld.tileMap.destructableIndexes.indexOf(this.index)==-1) {
+            if (this.game.dWorld.tileMap.destructableIndexes.indexOf(this.index) == -1) {
                 return;
             }
 
-            if(!this.isItCloseEnoughToPlayer()){
+            debugger;
+            if (!this.isItCloseEnoughToPlayer()) {
                 return;
             }
 
@@ -45,7 +46,7 @@ namespace Darkworld.Core {
             this.game.dWorld.tileMap.removeTile(this.x, this.y, this.game.dWorld.tileMap.blockingLayer);
             this.game.dWorld.tileMap.putTile(this.game.rnd.integerInRange(Darkworld.Utils.TileSetIndex.Dungeon.FloorStart, Darkworld.Utils.TileSetIndex.Dungeon.FloorEnd), this.x, this.y, this.game.dWorld.tileMap.floorLayer);//.alpha = 0;;
             this.game.dWorld.tileMap.updateCollisions();
-            
+
         }
 
         addComponent(component: Darkworld.Components.IComponent) {
