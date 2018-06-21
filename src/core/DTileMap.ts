@@ -86,7 +86,7 @@ namespace Darkworld.Core {
                         var tile = this.getTile(neighbour_x, neighbour_y, this.blockingLayer);
                         if (this.collideIndexes.indexOf(tile.index) > -1) {
                             count = count + 1;
-                        } 
+                        }
                     }
                 }
             }
@@ -97,15 +97,16 @@ namespace Darkworld.Core {
         private updateMarker() {
 
             var currentTile = this.getTileWorldXY(this.game.input.activePointer.worldX, this.game.input.activePointer.worldY, this.tileWidth, this.tileHeight, this.blockingLayer) as Darkworld.Core.DTile;
-            if (currentTile != null) {
-
+            if (currentTile != null && this.destructableIndexes.indexOf(currentTile.index) > -1) {
+                this.marker.alpha = 1;
                 this.marker.x = currentTile.x * this.tileWidth;
                 this.marker.y = currentTile.y * this.tileHeight;
 
                 if (this.game.input.activePointer.isDown) {
-                    console.log(currentTile);
                     currentTile.clicked();
                 }
+            } else {
+                this.marker.alpha = 0;
             }
         }
 

@@ -4,8 +4,11 @@ namespace Darkworld.Core {
         constructor(game: Darkworld.DGame, x?: number, y?: number) {
             super(game, x, y);
             this.game = game;
-            this.lineStyle(2, 0x000000, 1);
-            this.drawRect(0, 0, this.game.dWorld.tileMap.tileWidth, this.game.dWorld.tileMap.tileHeight);  
+            this.beginFill
+            this.lineStyle(2, 0x000000, 0.5);
+            this.beginFill(0x000000, 0.1);
+            this.drawRect(0, 0, this.game.dWorld.tileMap.tileWidth, this.game.dWorld.tileMap.tileHeight); 
+            this.endFill();
             game.add.existing(this);      
 
         }
