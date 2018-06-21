@@ -24,17 +24,18 @@ namespace Darkworld.Core {
 
             //fill map random
             //let randomTileMapData = new Darkworld.Data.RandomTileMapData(this.game, 4, 13, 50, 38);
-            let cellularAutomataGenerator = new Darkworld.Data.CellularAutomata(this.game, this.width, this.height, 0.4, 3, 4);
+            let cellularAutomataGenerator = new Darkworld.Data.CellularAutomata(this.game, this.width, this.height, 0.6, 3, 4);
             let randomTileMapData = cellularAutomataGenerator.generateMap(true);
-            console.log(randomTileMapData.join("\n "));
-           
+            
+            
+
 
             // let customMapDataGenerator = new Darkworld.Data.TestCustomMap();
             // let randomTileMapData = customMapDataGenerator.generateMap(true);
 
             //fill with floor first
-            for (var i = 0; i < randomTileMapData.length; i++) {
-                for (var j = 0; j < randomTileMapData[i].length; j++) {
+            for (var i = 0; i < this.width; i++) {
+                for (var j = 0; j < this.height; j++) {
                     this.putTile(this.game.rnd.integerInRange(Darkworld.Utils.TileSetIndex.Cave.FloorStart, Darkworld.Utils.TileSetIndex.Cave.FloorEnd), i, j);//.alpha = 0;;
                 }
             }
@@ -42,8 +43,8 @@ namespace Darkworld.Core {
 
 
             // create blocking layer
-            for (var i = 0; i < randomTileMapData.length; i++) {
-                for (var j = 0; j < randomTileMapData[i].length; j++) {
+            for (var i = 0; i < this.width; i++) {
+                for (var j = 0; j < this.height; j++) {
                     if (randomTileMapData[i][j] == 1) {
                         this.putTile(Darkworld.Utils.TileSetIndex.Cave.Stone, i, j, this.blockingLayer);
                     }
@@ -51,17 +52,17 @@ namespace Darkworld.Core {
             }
 
             //filling sides with badrock
-            for (var x = 0; x < randomTileMapData.length; x++) {
-                for (var y = 0; y < randomTileMapData[x].length; y++) {
-                    if (x == 0 || y == 0 || x == randomTileMapData.length - 1 || y == randomTileMapData[x].length - 1) {
+            for (var x = 0; x < this.width; x++) {
+                for (var y = 0; y < this.height; y++) {
+                    if (x == 0 || y == 0 || x == this.width - 1 || y == this.height - 1) {
                         this.putTile(Darkworld.Utils.TileSetIndex.Cave.BadRock, x, y, this.blockingLayer);
                     }
                 }
             }
 
-            
 
-            
+
+
             this.setCollision(this.collisionIndexes);
             this.game.physics.p2.convertTilemap(this, this.blockingLayer);
         }
@@ -76,6 +77,7 @@ namespace Darkworld.Core {
                 this.marker.y = currentTile.y * this.tileHeight;
 
                 if (this.game.input.activePointer.isDown) {
+                    console.log(currentTile);
                     currentTile.clicked();
                 }
             }
@@ -146,7 +148,7 @@ namespace Darkworld.Core {
 
                 let randomTile = this.getTile(randomX, randomY);
 
-                if (randomTile.index == 0) {
+                if (this.collisionIndexes.indexOf(randomTile.index) == -1) {
 
                     openCellFound = true; //we found an open cell
                     openCellPoint = new Phaser.Point(randomTile.worldX + randomTile.width / 2, randomTile.worldY + randomTile.height / 2);

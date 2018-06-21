@@ -15,7 +15,7 @@ namespace Darkworld.States {
             this.preloadBar = this.add.sprite(300, 400, 'preloaderBar');
             this.load.setPreloadSprite(this.preloadBar);
 
-            
+            debugger;
             this.game.dWorld = new Darkworld.Core.DWorld(this.game);
             this.game.dWorld.tileMap.enableTileMarker();
             //this.game.dWorld.addComponent(new Darkworld.Components.DayNightSystem(this.game));
