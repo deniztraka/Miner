@@ -1,5 +1,6 @@
 namespace Darkworld.Core {
     export class DWorld {
+        
         private customComponents: Array<Darkworld.Components.BaseComponent>;
 
         tileResolution: number;
@@ -10,7 +11,7 @@ namespace Darkworld.Core {
         mapWidth: number;
         player: Darkworld.Entities.Mobiles.Humanoids.Player;
         treasureHiddenLimit: number;
-        treasureCount:number;
+        treasures: Darkworld.Entities.Items.Chest[];
 
         constructor(game: Darkworld.DGame) {
             this.mapHeight = 50;//38
@@ -20,7 +21,11 @@ namespace Darkworld.Core {
             this.game = game;
             this.tileMap = new DTileMap(this.game, null, this.tileResolution, this.tileResolution, this.mapWidth, this.mapHeight);
             this.treasureHiddenLimit = 6;
-            this.treasureCount = 0;
+            this.treasures = [];
+        }
+
+        placeExit() {
+            
         }
 
         placeTreasures() {
@@ -36,17 +41,14 @@ namespace Darkworld.Core {
                         }
                     }
                 }
-            }     
-            
-            console.log(this.treasureCount);
+            }
+
+            console.log(this.treasures.length);
         }
 
         placeTreasure(x: number, y: number) {
-            //this.tileMap.putTile(Darkworld.Utils.TileSetIndex.Cave.BloodRock, x, y, this.tileMap.blockingLayer);
-            //let torch = new Darkworld.Entities.Items.Torch(this.game, x+this.tileMap.tileWidth/2, y+this.tileMap.tileHeight/2);
-            var chest = new Darkworld.Entities.Items.Chest(this.game,x+this.tileMap.tileWidth/2,y+this.tileMap.tileHeight/2);
-            
-            this.treasureCount++;
+            var chest = new Darkworld.Entities.Items.Chest(this.game, x + this.tileMap.tileWidth / 2, y + this.tileMap.tileHeight / 2);
+            this.treasures.push(chest);
         }
 
 

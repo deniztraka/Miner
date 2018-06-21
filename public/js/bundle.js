@@ -113611,8 +113611,10 @@ var Darkworld;
                 this.game = game;
                 this.tileMap = new Core.DTileMap(this.game, null, this.tileResolution, this.tileResolution, this.mapWidth, this.mapHeight);
                 this.treasureHiddenLimit = 6;
-                this.treasureCount = 0;
+                this.treasures = [];
             }
+            DWorld.prototype.placeExit = function () {
+            };
             DWorld.prototype.placeTreasures = function () {
                 //How hidden does a spot need to be for treasure?
                 //I find 5 or 6 is good. 6 for very rare treasure.
@@ -113627,13 +113629,11 @@ var Darkworld;
                         }
                     }
                 }
-                console.log(this.treasureCount);
+                console.log(this.treasures.length);
             };
             DWorld.prototype.placeTreasure = function (x, y) {
-                //this.tileMap.putTile(Darkworld.Utils.TileSetIndex.Cave.BloodRock, x, y, this.tileMap.blockingLayer);
-                //let torch = new Darkworld.Entities.Items.Torch(this.game, x+this.tileMap.tileWidth/2, y+this.tileMap.tileHeight/2);
                 var chest = new Darkworld.Entities.Items.Chest(this.game, x + this.tileMap.tileWidth / 2, y + this.tileMap.tileHeight / 2);
-                this.treasureCount++;
+                this.treasures.push(chest);
             };
             DWorld.prototype.addPlayer = function (isRandom, x, y) {
                 var playerSpawnPoint;
@@ -114096,6 +114096,7 @@ var Darkworld;
                 this.game.dWorld.tileMap.enableTileMarker();
                 this.game.dWorld.addComponent(new Darkworld.Components.DayNightSystem(this.game));
                 this.game.dWorld.placeTreasures();
+                this.game.dWorld.placeExit();
                 //start day night cycle asdasd
                 var dayNightCycleComponent = this.game.dWorld.getComponent("DayNightSystem");
                 if (dayNightCycleComponent != null) {

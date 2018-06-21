@@ -23,6 +23,8 @@ namespace Darkworld.States {
 
             this.game.dWorld.placeTreasures();
 
+            this.game.dWorld.placeExit();
+
             //start day night cycle asdasd
             let dayNightCycleComponent = this.game.dWorld.getComponent("DayNightSystem") as Darkworld.Components.DayNightSystem;
             if (dayNightCycleComponent != null) {
