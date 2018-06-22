@@ -112886,10 +112886,12 @@ var Darkworld;
                 this.game = game;
                 this.entity = entity;
                 this.inputHandler = new Darkworld.Engines.InputHandler(game);
-                this.timeOfLastTween = 0;
+                this.mouseIcon = new Darkworld.Core.MouseIcon(game, this.game.input.activePointer.worldX, this.game.input.activePointer.worldY);
             }
             MouseIcons.prototype.update = function () {
                 _super.prototype.update.call(this);
+                this.mouseIcon.position.x = this.game.input.activePointer.worldX;
+                this.mouseIcon.position.y = this.game.input.activePointer.worldY;
             };
             MouseIcons.prototype.debugRender = function () {
                 _super.prototype.debugRender.call(this);
@@ -113311,23 +113313,21 @@ var Darkworld;
                 var currentTile = this.getTileWorldXY(this.game.input.activePointer.worldX, this.game.input.activePointer.worldY, this.tileWidth, this.tileHeight, this.blockingLayer);
                 if (currentTile != null && this.destructableIndexes.indexOf(currentTile.index) > -1) {
                     this.marker.alpha = 1;
-                    if (currentTile.isItCloseEnoughToPlayer()) {
-                        this.marker.icon.alpha = 1;
-                    }
-                    else {
-                        this.marker.icon.alpha = 0;
-                    }
+                    // if(currentTile.isItCloseEnoughToPlayer()){
+                    //     this.marker.icon.alpha = 1;
+                    // }else{
+                    //     this.marker.icon.alpha = 0;
+                    // }
                     this.marker.x = currentTile.x * this.tileWidth;
                     this.marker.y = currentTile.y * this.tileHeight;
-                    this.marker.icon.x = this.marker.x + this.tileWidth / 2;
-                    this.marker.icon.y = this.marker.y + this.tileHeight / 2;
+                    // this.marker.icon.x = this.marker.x+this.tileWidth/2;
+                    // this.marker.icon.y = this.marker.y+this.tileHeight/2;
                     if (this.game.input.activePointer.isDown) {
                         currentTile.clicked();
                     }
                 }
                 else {
                     this.marker.alpha = 0;
-                    this.marker.icon.alpha = 0;
                 }
             };
             DTileMap.prototype.updateCollisions = function () {
@@ -113733,7 +113733,7 @@ var Darkworld;
                 this.drawRect(0, 0, this.game.dWorld.tileMap.tileWidth, this.game.dWorld.tileMap.tileHeight);
                 this.endFill();
                 game.add.existing(this);
-                this.icon = new Core.DTileIconMarker(game, x, y);
+                //this.icon =  new DTileIconMarker(game,x,y);
             }
             DTileMarker.prototype.update = function () {
             };
@@ -113838,30 +113838,44 @@ var Darkworld;
     })(Core = Darkworld.Core || (Darkworld.Core = {}));
 })(Darkworld || (Darkworld = {}));
 
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var Darkworld;
 (function (Darkworld) {
-    var Engines;
-    (function (Engines) {
-        var InputHandler = (function () {
-            function InputHandler(game) {
+    var Core;
+    (function (Core) {
+        var MouseIcon = (function (_super) {
+            __extends(MouseIcon, _super);
+            function MouseIcon(game, x, y) {
+                _super.call(this, game, x, y, "defaultIcon");
                 this.game = game;
-                this.isEnabled = true;
-                this.actionButton = this.game.input.activePointer.leftButton;
-                this.selectButton = this.game.input.activePointer.rightButton;
-                this.keyboard = this.game.input.keyboard;
+                this.anchor.setTo(0.5, 0.5);
+                game.add.existing(this);
             }
-            InputHandler.prototype.update = function () {
-                if (this.isEnabled) {
+            MouseIcon.prototype.update = function () {
+                if (this.game.dWorld == null || this.game.dWorld.tileMap == null) {
+                    return;
+                }
+                var currentTile = this.game.dWorld.tileMap.getTileWorldXY(this.game.input.activePointer.worldX, this.game.input.activePointer.worldY, this.game.dWorld.tileMap.tileWidth, this.game.dWorld.tileMap.tileHeight, this.game.dWorld.tileMap.blockingLayer);
+                if (currentTile != null && this.game.dWorld.tileMap.destructableIndexes.indexOf(currentTile.index) > -1) {
+                    if (currentTile.isItCloseEnoughToPlayer()) {
+                        //you can destruct it 
+                        this.loadTexture("picaxeIcon");
+                        this.alpha = 1;
+                    }
+                }
+                else {
+                    //this.alpha = 0;
+                    this.loadTexture("defaultIcon");
                 }
             };
-            InputHandler.prototype.getAngleFrom = function (entity) {
-                return this.game.physics.arcade.angleToPointer(entity);
-                //return Math.atan2(this.game.input.activePointer.y - entity.worldPosition.y, this.game.input.activePointer.x - entity.worldPosition.x ) * (180/Math.PI);
-            };
-            return InputHandler;
-        }());
-        Engines.InputHandler = InputHandler;
-    })(Engines = Darkworld.Engines || (Darkworld.Engines = {}));
+            return MouseIcon;
+        }(Phaser.Sprite));
+        Core.MouseIcon = MouseIcon;
+    })(Core = Darkworld.Core || (Darkworld.Core = {}));
 })(Darkworld || (Darkworld = {}));
 
 var Darkworld;
@@ -114053,6 +114067,32 @@ var Darkworld;
     })(Data = Darkworld.Data || (Darkworld.Data = {}));
 })(Darkworld || (Darkworld = {}));
 
+var Darkworld;
+(function (Darkworld) {
+    var Engines;
+    (function (Engines) {
+        var InputHandler = (function () {
+            function InputHandler(game) {
+                this.game = game;
+                this.isEnabled = true;
+                this.actionButton = this.game.input.activePointer.leftButton;
+                this.selectButton = this.game.input.activePointer.rightButton;
+                this.keyboard = this.game.input.keyboard;
+            }
+            InputHandler.prototype.update = function () {
+                if (this.isEnabled) {
+                }
+            };
+            InputHandler.prototype.getAngleFrom = function (entity) {
+                return this.game.physics.arcade.angleToPointer(entity);
+                //return Math.atan2(this.game.input.activePointer.y - entity.worldPosition.y, this.game.input.activePointer.x - entity.worldPosition.x ) * (180/Math.PI);
+            };
+            return InputHandler;
+        }());
+        Engines.InputHandler = InputHandler;
+    })(Engines = Darkworld.Engines || (Darkworld.Engines = {}));
+})(Darkworld || (Darkworld = {}));
+
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -114099,6 +114139,37 @@ var Darkworld;
         }(Phaser.Sprite));
         Entities.Entity = Entity;
     })(Entities = Darkworld.Entities || (Darkworld.Entities = {}));
+})(Darkworld || (Darkworld = {}));
+
+var Darkworld;
+(function (Darkworld) {
+    var Utils;
+    (function (Utils) {
+        var TileSetIndex;
+        (function (TileSetIndex) {
+            (function (Dungeon) {
+                Dungeon[Dungeon["FloorStart"] = 0] = "FloorStart";
+                Dungeon[Dungeon["FloorEnd"] = 63] = "FloorEnd";
+                Dungeon[Dungeon["WallStart"] = 64] = "WallStart";
+                Dungeon[Dungeon["WallEnd"] = 71] = "WallEnd";
+            })(TileSetIndex.Dungeon || (TileSetIndex.Dungeon = {}));
+            var Dungeon = TileSetIndex.Dungeon;
+            (function (Cave) {
+                Cave[Cave["Stone"] = 65] = "Stone";
+                Cave[Cave["BadRock"] = 64] = "BadRock";
+                Cave[Cave["BloodRock"] = 68] = "BloodRock";
+                Cave[Cave["WoodRock"] = 66] = "WoodRock";
+                Cave[Cave["IceRock"] = 67] = "IceRock";
+                Cave[Cave["FloorStart"] = 0] = "FloorStart";
+                Cave[Cave["FloorEnd"] = 63] = "FloorEnd";
+            })(TileSetIndex.Cave || (TileSetIndex.Cave = {}));
+            var Cave = TileSetIndex.Cave;
+            (function (Fov) {
+                Fov[Fov["Fov"] = 79] = "Fov";
+            })(TileSetIndex.Fov || (TileSetIndex.Fov = {}));
+            var Fov = TileSetIndex.Fov;
+        })(TileSetIndex = Utils.TileSetIndex || (Utils.TileSetIndex = {}));
+    })(Utils = Darkworld.Utils || (Darkworld.Utils = {}));
 })(Darkworld || (Darkworld = {}));
 
 var __extends = (this && this.__extends) || function (d, b) {
@@ -114173,6 +114244,11 @@ var Darkworld;
                 this.input.onTap.addOnce(function () {
                     _this.state.start("Running");
                 });
+                this.mouseIcon = new Darkworld.Core.MouseIcon(this.game, this.game.input.activePointer.worldX, this.game.input.activePointer.worldY);
+            };
+            Main.prototype.update = function () {
+                this.mouseIcon.position.x = this.game.input.activePointer.worldX;
+                this.mouseIcon.position.y = this.game.input.activePointer.worldY;
             };
             return Main;
         }(Phaser.State));
@@ -114208,6 +114284,7 @@ var Darkworld;
                 this.load.spritesheet('chests', './../img/sprites/chest_32x32.png', 32, 32);
                 this.load.image('playerImg', './../img/player.png');
                 this.load.image('picaxeIcon', './../img/mouseIcons/pickaxe.png');
+                this.load.image('defaultIcon', './../img/mouseIcons/default.png');
             };
             Preloader.prototype.create = function () {
                 this.game.state.start("Main");
@@ -114265,37 +114342,6 @@ var Darkworld;
         }(Phaser.State));
         States.Running = Running;
     })(States = Darkworld.States || (Darkworld.States = {}));
-})(Darkworld || (Darkworld = {}));
-
-var Darkworld;
-(function (Darkworld) {
-    var Utils;
-    (function (Utils) {
-        var TileSetIndex;
-        (function (TileSetIndex) {
-            (function (Dungeon) {
-                Dungeon[Dungeon["FloorStart"] = 0] = "FloorStart";
-                Dungeon[Dungeon["FloorEnd"] = 63] = "FloorEnd";
-                Dungeon[Dungeon["WallStart"] = 64] = "WallStart";
-                Dungeon[Dungeon["WallEnd"] = 71] = "WallEnd";
-            })(TileSetIndex.Dungeon || (TileSetIndex.Dungeon = {}));
-            var Dungeon = TileSetIndex.Dungeon;
-            (function (Cave) {
-                Cave[Cave["Stone"] = 65] = "Stone";
-                Cave[Cave["BadRock"] = 64] = "BadRock";
-                Cave[Cave["BloodRock"] = 68] = "BloodRock";
-                Cave[Cave["WoodRock"] = 66] = "WoodRock";
-                Cave[Cave["IceRock"] = 67] = "IceRock";
-                Cave[Cave["FloorStart"] = 0] = "FloorStart";
-                Cave[Cave["FloorEnd"] = 63] = "FloorEnd";
-            })(TileSetIndex.Cave || (TileSetIndex.Cave = {}));
-            var Cave = TileSetIndex.Cave;
-            (function (Fov) {
-                Fov[Fov["Fov"] = 79] = "Fov";
-            })(TileSetIndex.Fov || (TileSetIndex.Fov = {}));
-            var Fov = TileSetIndex.Fov;
-        })(TileSetIndex = Utils.TileSetIndex || (Utils.TileSetIndex = {}));
-    })(Utils = Darkworld.Utils || (Darkworld.Utils = {}));
 })(Darkworld || (Darkworld = {}));
 
 // namespace Darkworld.Core {
@@ -114572,6 +114618,7 @@ var Darkworld;
                         //Add components here
                         this.addComponents([
                             //new Darkworld.Components.LookAtMouse(game, this),
+                            new Darkworld.Components.MouseIcons(game, this),
                             new Darkworld.Components.KeyboardMovement(game, this)
                         ]);
                         this.addFov();

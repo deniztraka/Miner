@@ -31,7 +31,7 @@ namespace Darkworld.States {
                 //dayNightCycleComponent.startCycle();
             } 
   
-            this.game.player = this.game.dWorld.addPlayer(true,96,96);
+            this.game.player = this.game.dWorld.addPlayer(true,96,96);            
 
             //this.game.dWorld.tileMap.putDTile(this.player);
 

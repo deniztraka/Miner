@@ -17,6 +17,7 @@ namespace Darkworld.States {
             this.load.spritesheet('chests', './../img/sprites/chest_32x32.png', 32, 32);
             this.load.image('playerImg', './../img/player.png');
             this.load.image('picaxeIcon', './../img/mouseIcons/pickaxe.png');
+            this.load.image('defaultIcon', './../img/mouseIcons/default.png');
         }
 
         create() {

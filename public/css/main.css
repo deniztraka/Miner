@@ -18,4 +18,5 @@ canvas {
     top: 50%;
     transform: translate(-50%, -50%);
     color: rgb(105, 105, 105);
+    cursor: none;
 }

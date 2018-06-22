@@ -1,7 +1,7 @@
 namespace Darkworld.States {
 
     export class Main extends Phaser.State {
-
+        mouseIcon:Darkworld.Core.MouseIcon;
         create() {
             const lines = [
                 "click to enter",
@@ -25,6 +25,13 @@ namespace Darkworld.States {
             this.input.onTap.addOnce(()=>{
                 this.state.start("Running");
             });
+
+            this.mouseIcon = new Darkworld.Core.MouseIcon(this.game as Darkworld.DGame, this.game.input.activePointer.worldX, this.game.input.activePointer.worldY);
+        }
+
+        update(){
+            this.mouseIcon.position.x = this.game.input.activePointer.worldX;
+            this.mouseIcon.position.y = this.game.input.activePointer.worldY;
         }
     }
 }

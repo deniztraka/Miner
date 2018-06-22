@@ -11,7 +11,7 @@ namespace Darkworld.Core {
             this.drawRect(0, 0, this.game.dWorld.tileMap.tileWidth, this.game.dWorld.tileMap.tileHeight); 
             this.endFill();
             game.add.existing(this);     
-            this.icon =  new DTileIconMarker(game,x,y);
+            //this.icon =  new DTileIconMarker(game,x,y);
 
         }
 
