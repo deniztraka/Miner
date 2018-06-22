@@ -20,15 +20,22 @@ namespace Darkworld.Entities {
             });            
         }
 
-        deleteComponent(name:string){
-            var componentToDelete:Darkworld.Components.IComponent = null;
+        getComponent(name:string):Darkworld.Components.IComponent{
+            var componentToGet:Darkworld.Components.IComponent = null;
             var filteredArray = this.customComponents.filter(function(component){
                 return component.name == name;
             });
 
             if(filteredArray.length != 0){
-                componentToDelete = filteredArray[0];
+                componentToGet = filteredArray[0];
             }
+
+            return componentToGet;
+        }
+
+        deleteComponent(name:string){
+            var componentToDelete:Darkworld.Components.IComponent = null;
+            componentToDelete = this.getComponent(name);
 
             if(componentToDelete != null){
                 this.customComponents.splice(this.customComponents.indexOf(componentToDelete),1);

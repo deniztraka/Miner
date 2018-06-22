@@ -3,7 +3,7 @@ namespace Darkworld.Components {
         private game: DGame;
         private entity: Darkworld.Entities.Entity;
         private inputHandler: Darkworld.Engines.InputHandler;
-        private mouseIcon: Darkworld.Core.MouseIcon;
+        public mouseIcon: Darkworld.Core.MouseIcon;
 
         isEnabled: boolean;
         angleToPointer: number;

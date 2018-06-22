@@ -18,6 +18,7 @@ namespace Darkworld.States {
             this.load.image('playerImg', './../img/player.png');
             this.load.image('picaxeIcon', './../img/mouseIcons/pickaxe.png');
             this.load.image('defaultIcon', './../img/mouseIcons/default.png');
+            this.load.image('handIcon', './../img/mouseIcons/hand.png');
         }
 
         create() {

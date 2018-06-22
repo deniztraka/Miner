@@ -1,6 +1,7 @@
 namespace Darkworld.Core {
     export class MouseIcon extends Phaser.Sprite {
         game: DGame;
+        onOverItem: boolean;
         constructor(game: Darkworld.DGame, x?: number, y?: number) {
             super(game, x, y, "defaultIcon");
             this.game = game;
@@ -14,7 +15,7 @@ namespace Darkworld.Core {
             if (this.game.dWorld == null || this.game.dWorld.tileMap == null) {
                 return;
             }
-            
+
             var currentTile = this.game.dWorld.tileMap.getTileWorldXY(
                 this.game.input.activePointer.worldX,
                 this.game.input.activePointer.worldY,
@@ -33,7 +34,11 @@ namespace Darkworld.Core {
                 }
             } else {
                 //this.alpha = 0;
-                this.loadTexture("defaultIcon");
+                if (!this.onOverItem) {
+
+
+                    this.loadTexture("defaultIcon");
+                }
             }
 
         }
