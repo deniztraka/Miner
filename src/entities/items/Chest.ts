@@ -25,6 +25,7 @@ namespace Darkworld.Entities.Items{
             if(!this.isOpened && this.isItCloseEnoughToPlayer()){
                 this.isOpened = true;
                 this.frame = 1;
+                this.deleteComponent("Fov");
             }            
         }
 

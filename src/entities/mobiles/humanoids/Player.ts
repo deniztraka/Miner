@@ -7,7 +7,7 @@ namespace Darkworld.Entities.Mobiles.Humanoids {
             this.speed = 100;
             this.body.setZeroDamping();
             this.body.fixedRotation = true;
-            this.effectiveDistance = 50;
+            this.effectiveDistance = 75;
 
             //Add components here
             this.addComponents([

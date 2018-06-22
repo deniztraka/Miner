@@ -20,6 +20,21 @@ namespace Darkworld.Entities {
             });            
         }
 
+        deleteComponent(name:string){
+            var componentToDelete:Darkworld.Components.IComponent = null;
+            var filteredArray = this.customComponents.filter(function(component){
+                return component.name == name;
+            });
+
+            if(filteredArray.length != 0){
+                componentToDelete = filteredArray[0];
+            }
+
+            if(componentToDelete != null){
+                this.customComponents.splice(this.customComponents.indexOf(componentToDelete),1);
+            }
+        }
+
         update(){
             super.update();            
             this.customComponents.forEach(component => {
